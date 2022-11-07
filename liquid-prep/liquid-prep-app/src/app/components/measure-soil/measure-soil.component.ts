@@ -1,13 +1,15 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
-import { SwiperOptions } from 'swiper';
-import { SwiperComponent} from 'ngx-swiper-wrapper';
-import {SoilMoistureService} from '../../service/SoilMoistureService';
-import {SoilMoisture} from '../../models/SoilMoisture';
-import {LineBreakTransformer} from './LineBreakTransformer';
 import { HttpClient } from '@angular/common/http';
-import { throwToolbarMixedModesError } from '@angular/material/toolbar';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { SwiperComponent } from 'ngx-swiper-wrapper';
+import { Observable } from 'rxjs';
+import { SwiperOptions } from 'swiper';
+
+import { SensorConnection } from '../../interface';
+import { SoilMoisture } from '../../models/SoilMoisture';
+import { SoilMoistureService } from '../../service/SoilMoistureService';
+import { LineBreakTransformer } from './LineBreakTransformer';
 
 @Component({
   selector: 'app-measure-soil',
@@ -15,6 +17,9 @@ import { throwToolbarMixedModesError } from '@angular/material/toolbar';
   styleUrls: ['./measure-soil.component.scss'],
 })
 export class MeasureSoilComponent implements OnInit, AfterViewInit {
+  public sensorConnection = SensorConnection;
+  private ws: WebSocket;
+  querying = false;
   constructor(
     private router: Router,
     private location: Location,
@@ -68,19 +73,24 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
   }
 
-  public onSensorConnect(connectionOption){
+  public onSensorConnect(connectionOption: SensorConnection){
 
-    if (connectionOption === 'usb') {
+    if (connectionOption === this.sensorConnection.usb) {
       this.connectUSB().then( sensorValue => {
         this.showReading(sensorValue);
       });
-    } else if (connectionOption === 'ble') {
+    } else if (connectionOption === this.sensorConnection.ble) {
       this.connectBluetooth().then( sensorValue => {
         this.showReading(sensorValue);
       });
-    } else if (connectionOption === 'wifi') {
+    } else if (connectionOption === this.sensorConnection.wifi) {
       this.connectWifi().then( sensorValue => {
         this.showReading(sensorValue);
+      });
+    } else if (connectionOption === this.sensorConnection.webSocket) {
+      this.connectWebSocket().subscribe( {
+        next: (sensorValue: number) => this.showReading(sensorValue),
+        error: (err) => console.log(err)
       });
     } else {
       alert('Please choose one soil sensor connection option.');
@@ -96,6 +106,50 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
     }
   }
 
+  connectWebSocket() {
+    return new Observable((observer) => {
+      this.querying = true;
+      let sensorMoisturePercantage: number;
+      const ip = this.soilService.webSocketIp && this.soilService.webSocketIp.length > 0 ? this.soilService.webSocketIp : "ws://xxx.xxx.xxx.xxx:wsport";
+      const endpoint = prompt("Please enter sensor websocket endpoint", ip);
+      if(endpoint) {
+        this.soilService.webSocketIp = endpoint;
+      }
+  
+      try {
+        if(!this.ws) {
+          this.ws = new WebSocket(endpoint)
+          this.ws.onopen = (event) => {
+            console.log(event)
+            this.ws.send('Get measurement')
+          }
+          this.ws.onmessage = (event) => {
+            console.log(event.data)
+            try {
+              const json = JSON.parse(event.data);
+              if(json.moisture) {
+                sensorMoisturePercantage = json.moisture;
+                this.querying = false;
+                observer.next(sensorMoisturePercantage);
+                observer.complete();
+              }  
+            } catch(e) {
+              
+            }
+          }
+          this.ws.onclose = (event) => {
+            this.querying = false;
+            this.ws = null;
+          }
+        } else {
+          this.ws.send('Get measurement')          
+        }
+      } catch (e) {
+        window.alert('Failed to connect to sensor via WebSocket.  Please try again.');
+        observer.error(e)
+      }  
+    })
+  }
   async connectWifi() {
     let sensorMoisturePercantage: number;
     const ip = this.soilService.sensorIp && this.soilService.sensorIp.length > 0 ? this.soilService.sensorIp : "http://xxx.xxx.xxx.xxx/moisture.json";

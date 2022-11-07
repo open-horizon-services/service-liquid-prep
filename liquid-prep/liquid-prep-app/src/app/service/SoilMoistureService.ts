@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+
 import { SoilMoisture } from '../models/SoilMoisture';
 
 @Injectable({
@@ -7,6 +8,7 @@ import { SoilMoisture } from '../models/SoilMoisture';
 
 export class SoilMoistureService {
   sensorIp = '';
+  webSocketIp = '';
   private soilMoistureReadingPercentage = 0;
 
   public setSoilMoistureReading(valuePercentage) {
