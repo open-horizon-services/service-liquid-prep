@@ -11,7 +11,7 @@
       "forceConsistentCasingInFileNames": true,
       "importHelpers": false,
       "rootDir": "./src",
-      "outDir": "",
+      "outDir": "dist",
       "baseUrl": ".",
       "paths": {
       },

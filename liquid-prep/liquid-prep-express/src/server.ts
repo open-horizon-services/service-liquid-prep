@@ -1,19 +1,24 @@
-import fileUpload from 'express-fileupload';
-import path from 'path';
 import cors from 'cors';
-import { Weather, CloudantDBService, util } from 'liquid-prep-lib';
 import express from 'express';
-import * as https from 'https';
+import fileUpload from 'express-fileupload';
+import * as http from 'http';
+import { util } from 'liquid-prep-lib';
+import path from 'path';
+
+import { Utils } from './common';
 
 export class Server {
   app = express();
   apiUrl = `${process.env.SERVERLESS_ENDPOINT}`
-  constructor() {
+  constructor(private port = 3000) {
     this.initialise()
   }
 
   initialise() {
     let app = this.app;
+    const server = http.createServer(app);
+    const utils = new Utils(server, this.port);
+
     app.use(cors({
       origin: '*'
     }));
@@ -70,8 +75,8 @@ export class Server {
     //   )
     // });
   
-    app.listen(3000, () => {
-      console.log('Started on 3000');
-    });
+    //app.listen(this.port, () => {
+    //  console.log(`Started on ${this.port}`);
+    //});
   }
 }
