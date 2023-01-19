@@ -33,6 +33,26 @@ const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const http = __importStar(require("http"));
 const liquid_prep_lib_1 = require("liquid-prep-lib");
 const path_1 = __importDefault(require("path"));
+
+// path of web socket
+ const url = "http://192.168.4.222/moisture.json";
+ const settings = { method: "Get" };
+ let  moistureJSON;;
+
+    // function to get moisture level from web socket
+    function getMoistureLevel() {
+        fetch(url, settings)
+            .then(res => res.json())
+            .catch(error => console.error('Error:', error))
+            .then((json) => {
+                moistureJSON = json;
+          //      console.log(moistureJSON);
+            });
+            setTimeout(getMoistureLevel, 60000);
+
+
+    }
+
 class Server {
     constructor(port = 3000) {
         this.port = port;
@@ -42,6 +62,7 @@ class Server {
     }
     initialise() {
         let app = this.app;
+        getMoistureLevel();
         const server = http.createServer(app);
         app.use((0, cors_1.default)({
             origin: '*'
@@ -90,6 +111,11 @@ class Server {
         // });
         app.listen(this.port, () => {
             console.log(`Started on ${this.port}`);
+        });
+
+        app.get("/moisture_level", (res) => {
+            res.send(moistureJSON);
+         //   console.log(`sent moisture level: ${moistureJSON}`);
         });
     }
 }
