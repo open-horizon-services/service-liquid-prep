@@ -7,6 +7,8 @@ import path from 'path';
 
 import { Utils } from './common';
 
+declare const process: any;
+
 export class Server {
   app = express();
   apiUrl = `${process.env.SERVERLESS_ENDPOINT}`
@@ -16,13 +18,13 @@ export class Server {
 
   initialise() {
     let app = this.app;
-    const server = http.createServer(app);
-    const utils = new Utils(server, this.port);
-
     app.use(cors({
       origin: '*'
     }));
     app.use(fileUpload());
+
+    const server = http.createServer(app);
+    const utils = new Utils(server, this.port);
   
     app.use('/static', express.static('public'));
 
@@ -38,7 +40,40 @@ export class Server {
     app.get("/staff", (req: express.Request, res: express.Response) => {
       res.json(["Jeff", "Gaurav"]);
     });
-  
+
+    app.post('/upload', (req: any, res: any) => {
+      try {
+        this.setInteractive();
+        if (!req.files || Object.keys(req.files).length === 0) {
+          return res.status(400).send('No files were uploaded.');
+        } else {
+          let imageFile = req.files.imageFile;
+          const mimetype = imageFile ? imageFile.mimetype : '';
+          if(mimetype.indexOf('image/') >= 0 || mimetype.indexOf('video/') >= 0) {
+            // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+            console.log('type: ', imageFile, imageFile.mimetype)
+            let uploadPath = __dirname + `/public/images/image.png`;
+            if(mimetype.indexOf('video/') >= 0) {
+              let ext = imageFile.name.match(/\.([^.]*?)$/);
+              uploadPath = __dirname + `/public/video/video${ext[0]}`;
+            }
+            
+            // Use the mv() method to place the file somewhere on your server
+            imageFile.mv(uploadPath, function(err) {
+              if (err)
+                return res.status(500).send(err);
+        
+              res.send({status: true, message: 'File uploaded!'});
+            });
+          } else {
+            res.send({status: true, message: 'Only image and video files are accepted.'});
+          }
+        }  
+      } catch(err) {
+        res.status(500).send(err);
+      }
+    });
+
     app.get("/get_weather_info", (req: express.Request, res: express.Response, next) => {
       util.httpGet(`${this.apiUrl}/get_weather_info`)
       .subscribe({
@@ -78,5 +113,8 @@ export class Server {
     //app.listen(this.port, () => {
     //  console.log(`Started on ${this.port}`);
     //});
+  }
+  setInteractive = () => {
+    process.env.npm_config_lastinteractive = Date.now();
   }
 }

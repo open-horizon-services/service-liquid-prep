@@ -1,0 +1,35 @@
+.horizontal {
+  display: flex;
+  flex-direction: row;
+  padding-top: 10px;
+  padding-left: 8px;
+  padding-right: 6px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.float-right {
+  float: right;
+}
+
+.mat-icon-button {
+  width: 30px;
+}
+
+.hzn-card {
+  max-width: 100%;
+}
+
+.hzn-card-content {
+  width: 100%;
+  margin-top: 3px;
+  margin-left: -29px;
+}
+.wrapper {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+:host ::ng-deep webcam .webcam-wrapper, .webcam-wrapper .camera-switch {
+  right: 38px;
+}

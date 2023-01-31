@@ -1,0 +1,60 @@
+<div class="imgHolder">
+  <div class="horizontal">
+    <div class="temp">
+      <span class="vertical-align-middle">Inspect</span>
+    </div>
+    <div class="float-right">
+      <button
+        class="vertical-align-middle"
+        mat-icon-button
+        color="primary"
+        (click)="goHome()"
+        title="Take Picture"
+        [disabled]="isCameraDisabled"
+      >
+        <mat-icon>home</mat-icon>
+      </button>
+      <button
+        class="vertical-align-middle"
+        mat-icon-button
+        color="primary"
+        (click)="triggerSnapshot()"
+        title="Take Picture"
+        [disabled]="isCameraDisabled"
+      >
+        <mat-icon #front_camera>camera_front</mat-icon>
+      </button>
+
+      <button
+        class="vertical-align-middle"
+        mat-icon-button
+        color="primary"
+        (click)="showNextWebcam(true)"
+        title="Switch Camera"
+        [disabled]="isCameraDisabled"
+      >
+        <mat-icon #front_camera>camera_alt</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
+
+<mat-card #mat_card class="hzn-card">
+  <mat-card-header #mat_card_header>
+    <mat-card-content #mat_card_content class="hzn-card-content">
+      <div class="wrapper">
+        <webcam
+          [height]="cameraHeight"
+          [width]="cameraWidth"
+          [trigger]="triggerObservable"
+          (imageCapture)="handleImage($event)"
+          *ngIf="showWebcam"
+          [allowCameraSwitch]="allowCameraSwitch"
+          [switchCamera]="nextWebcamObservable"
+          (cameraSwitched)="cameraWasSwitched($event)"
+          (initError)="handleInitError($event)"
+        ></webcam>
+      </div>
+    </mat-card-content>
+  </mat-card-header>
+</mat-card>

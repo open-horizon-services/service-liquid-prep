@@ -6,7 +6,7 @@
   "scripts": {
     "rebuild": "del-cli --force dist && npm run build",
     "build": "tsc",
-    "start": "node dist/find-node.js",
+    "start": "node dist/find-node.js $PORT",
     "watch:deploy": "nodemon -e ts,js --watch 'src/**/*.ts' --watch 'public/js/*.js' --watch 'dist/**/*.js' --exec 'npm run build && npm run start'",
     "debug": "DEBUG=liquid-prep npm run watch:deploy",
     "test": "echo \"Error: no test specified\" && exit 1"

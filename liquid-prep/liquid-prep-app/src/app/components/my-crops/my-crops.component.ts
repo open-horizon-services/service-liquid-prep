@@ -1,13 +1,12 @@
-import {Component, OnInit, Input, ApplicationRef, NgZone} from '@angular/core';
 import { formatDate, Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-
-import { Crop } from '../../models/Crop';
-import { WeatherDataService } from 'src/app/service/WeatherDataService';
+import { Router } from '@angular/router';
 import { TodayWeather } from 'src/app/models/TodayWeather';
 import { CropDataService } from 'src/app/service/CropDataService';
-import { DateTimeUtil } from 'src/app/utility/DateTimeUtil';
+import { WeatherDataService } from 'src/app/service/WeatherDataService';
+
+import { Crop } from '../../models/Crop';
 
 @Component({
   selector: 'app-my-crops',
@@ -21,6 +20,8 @@ export class MyCropsComponent implements OnInit {
   tabs = ['My Crops', 'Settings'];
   activeTab = this.tabs[0];
   background: ThemePalette = undefined;
+
+  isCameraDisabled = false;
 
   public currentDate = '';
   public weatherIconDay = '';
@@ -40,6 +41,7 @@ export class MyCropsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    //this.isCameraDisabled = location.hostname.indexOf('localhost') < 0 && location.protocol !== 'https';
 
     this.cropDataService.getMyCrops().subscribe(myCrops => {
       this.myCrops = myCrops;
@@ -97,6 +99,10 @@ export class MyCropsComponent implements OnInit {
 
   onAdd1stCrop() {
     this.router.navigateByUrl('/select-crop').then(r => {});
+  }
+
+  inspect() {
+    this.router.navigateByUrl('/inspect').then(r => {});
   }
 
   updateWeatherInfo(){

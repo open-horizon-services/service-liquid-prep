@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { WelcomeComponent } from './components/welcome/welcome.component';
-import { MyCropsComponent } from './components/my-crops/my-crops.component';
+import { RouterModule, Routes } from '@angular/router';
+
+import { AdviceComponent } from './components/advice/advice.component';
+import { InspectComponent } from './components/inspect/inspect.component';
 import { MeasureSoilComponent } from './components/measure-soil/measure-soil.component';
+import { MyCropsComponent } from './components/my-crops/my-crops.component';
 import { SeedDateComponent } from './components/seed-date/seed-date.component';
 import { SettingsComponent } from './components/settings/settings.component';
-import { AdviceComponent } from './components/advice/advice.component';
+import { WelcomeComponent } from './components/welcome/welcome.component';
 
 const routes: Routes = [
   {
@@ -16,6 +18,10 @@ const routes: Routes = [
     path: 'select-crop',
     loadChildren: () => import('./components/select-crop/select-crop.module')
       .then(m => m.SelectCropModule)
+  },
+  {
+    path: 'inspect',
+    component: InspectComponent
   },
   {
     path: 'my-crops',

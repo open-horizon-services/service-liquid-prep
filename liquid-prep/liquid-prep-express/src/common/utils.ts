@@ -7,6 +7,11 @@ export class Utils {
   localPath = './local-shared';
   assets = './assets';
   public = './public';
+  imagePath = './public/images';
+  videoPath = './public/video';
+  currentModelPath = './model';
+  newModelPath = './model-new';
+  oldModelPath = './model-old';
   sharedPath = '';
   intervalMS = 10000;
   timer: NodeJS.Timer = null;
@@ -24,6 +29,21 @@ export class Utils {
     }
     if(!existsSync(this.public)) {
       mkdirSync(this.public);
+    }
+    if(!existsSync(this.imagePath)) {
+      mkdirSync(this.imagePath);
+    }
+    if(!existsSync(this.videoPath)) {
+      mkdirSync(this.videoPath);
+    }
+    if(!existsSync(this.currentModelPath)) {
+      mkdirSync(this.currentModelPath);
+    }
+    if(!existsSync(this.newModelPath)) {
+      mkdirSync(this.newModelPath);
+    }
+    if(!existsSync(this.oldModelPath)) {
+      mkdirSync(this.oldModelPath);
     }
   }
   initWebSocketServer() {
