@@ -27,9 +27,11 @@
 }
 .wrapper {
   display: flex;
-  height: 100vh;
   overflow: hidden;
 }
 :host ::ng-deep webcam .webcam-wrapper, .webcam-wrapper .camera-switch {
-  right: 5px;
+  right: 2px;
+}
+:host ::ng-deep table.mat-table {
+  width: 100%;
 }

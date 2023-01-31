@@ -1,5 +1,9 @@
-import { existsSync, mkdirSync } from 'fs';
+import { Observable, Subject, forkJoin } from 'rxjs';
+import { existsSync, mkdirSync, unlinkSync, stat, renameSync, readdirSync, copyFileSync, readFileSync } from 'fs';
 import WebSocket from 'ws';
+const ffmpeg = require('ffmpeg');
+const tfnode = require('@tensorflow/tfjs-node');
+const jsonfile = require('jsonfile');
 
 export class Utils {
   homePath = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
@@ -13,9 +17,17 @@ export class Utils {
   newModelPath = './model-new';
   oldModelPath = './model-old';
   staticPath = './public/js';
+  backupPath = './public/backup';
+  oldImage = `./public/images/image-old.png`;
   sharedPath = '';
   intervalMS = 10000;
   timer: NodeJS.Timer = null;
+  videoFormat = ['.mp4', '.avi', '.webm'];
+  videoSrc = '/static/backup/video-old.mp4';
+  confidentCutoff = 0.85;
+  model;
+  labels;
+  version;
   state = {
     server: null,
     sockets: [],
@@ -53,6 +65,9 @@ export class Utils {
     if(!existsSync(this.oldModelPath)) {
       mkdirSync(this.oldModelPath);
     }
+    this.loadModel(this.currentModelPath)
+    this.initialInference();  
+    this.setInterval(this.intervalMS);
   }
   initWebSocketServer() {
     // Creating a new websocket server
@@ -96,5 +111,385 @@ export class Utils {
       //console.log('Socket added: ', this.state.sockets.length)
     })
   }
+  resetTimer() {
+    clearInterval(this.timer);
+    this.timer = null;
+    this.setInterval(this.intervalMS);  
+  }
+  checkMMS() {
+    try {
+      let list;
+      let config;
+      if(existsSync(this.mmsPath)) {
+        list = readdirSync(this.mmsPath);
+        list = list.filter(item => /(\.zip)$/.test(item));
+        this.sharedPath = this.mmsPath;  
+      } else if(existsSync(this.localPath)) {
+        list = readdirSync(this.localPath);
+        config = list.filter(item => item === 'config.json');
+        list = list.filter(item => /(\.zip)$/.test(item));
+        this.sharedPath = this.localPath;
+      }
+      this.checkVideo();
+      return list;  
+    } catch(e) {
+      console.log(e)
+    }
+  }
+  getVideoFile(file) {
+    let video = undefined;
+    this.videoFormat.every((ext) => {
+      let v = `${file}${ext}`;
+      if(existsSync(v)) {
+        video = v;
+        return false;
+      } else {
+        return true;
+      }
+    })
+    return video;
+  }
+  async checkImage () {
+    try {
+      let imageFile = `${this.imagePath}/image.png`;
+      if(!existsSync(imageFile)) {
+        imageFile = `${this.imagePath}/image.jpg`;
+      }
+      if(existsSync(imageFile)) {
+        try {
+          let cycles = 0;
+          console.log(imageFile)
+          const image = readFileSync(imageFile);
+          const decodedImage = tfnode.node.decodeImage(new Uint8Array(image), 3);
+          const inputTensor = decodedImage.expandDims(0);
+          this.inference(inputTensor)
+          .subscribe((json) => {
+            let images = {};
+            images['/static/images/image-old.png'] = json;
+            json = Object.assign({images: images, version: this.version, confidentCutoff: this.confidentCutoff, platform: `${process.platform}:${process.arch}`});
+            jsonfile.writeFile(`${this.staticPath}/image.json`, json, {spaces: 2});
+            this.renameFile(imageFile, `${this.imagePath}/image-old.png`);
+          });
+        } catch(e) {
+          console.log(e);
+          unlinkSync(imageFile);
+        }
+      }  
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  checkVideo() {
+    try {
+      let video = this.getVideoFile(`${this.videoPath}/video`);
+      if(!video) {
+        return;
+      }
+      console.log('here')
+      this.extractVideo(video)
+      .subscribe((files: any) => {
+        if(files.length > 0) {
+          let images = files.filter((f) => f.indexOf('.jpg') > 0);
+          let video = files.filter((f) => f.indexOf('.jpg') < 0);
+          if(existsSync(video[0])) {
+            console.log(video[0]);
+            copyFileSync(video[0], './public/backup/video-old.mp4');
+            unlinkSync(video[0]);
+          }
+          this.inferenceVideo(images);  
+        }
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  initialInference() {
+    if(!existsSync(this.oldImage)) {
+      copyFileSync(`${this.imagePath}/backup.png`, this.oldImage)
+    }
+    this.renameFile(this.oldImage, `${this.imagePath}/image.png`);
+  }
+  inference(inputTensor) {
+    return new Observable((observer) => {
+      const startTime = tfnode.util.now();
+      let outputTensor = this.model.predict({input_tensor: inputTensor});
+      const scores = outputTensor['detection_scores'].arraySync();
+      const boxes = outputTensor['detection_boxes'].arraySync();
+      const classes = outputTensor['detection_classes'].arraySync();
+      const num = outputTensor['num_detections'].arraySync();
+      const endTime = tfnode.util.now();
+      outputTensor['detection_scores'].dispose();
+      outputTensor['detection_boxes'].dispose();
+      outputTensor['detection_classes'].dispose();
+      outputTensor['num_detections'].dispose();
+      
+      let predictions = [];
+      const elapsedTime = endTime - startTime;
+      for (let i = 0; i < scores[0].length; i++) {
+        let score = scores[0][i].toFixed(2);
+        if (score >= this.confidentCutoff) {
+          predictions.push({
+            detectedBox: boxes[0][i].map((el)=>el.toFixed(2)),
+            detectedClass: this.labels[classes[0][i]],
+            detectedScore: score
+          });
+        }
+      }
+      console.log('predictions:', predictions.length, predictions[0]);
+      console.log('time took: ', elapsedTime);
+      console.log('build json...');
+      observer.next({bbox: predictions, elapsedTime: elapsedTime});
+      observer.complete();  
+    });
+  }
+  inferenceVideo(files) {
+    try {
+      let $inference = {};
+      files.forEach(async (imageFile) => {
+        if(existsSync(imageFile)) {
+          console.log(imageFile)
+          const image = readFileSync(imageFile);
+          const decodedImage = tfnode.node.decodeImage(new Uint8Array(image), 3);
+          const inputTensor = decodedImage.expandDims(0);
+          $inference[imageFile.replace('./public/', '/static/')] = (this.inference(inputTensor));
+        }
+      })
+      forkJoin($inference)
+      .subscribe({
+        next: (value) => {
+          console.log(value);
+          let json = Object.assign({}, {images: value, version: this.version, videoSrc: `${this.videoSrc}?${Date.now()}`, confidentCutoff: this.confidentCutoff, platform: `${process.platform}:${process.arch}`});
+          jsonfile.writeFile(`${this.staticPath}/video.json`, json, {spaces: 2});
+          // this.soundEffect(mp3s.theForce);  
+        },
+        complete: () => {
+          console.log('complete');
+        }
+      });
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  extractVideo(file) {
+    return new Observable((observer) => {
+      try {
+        if(existsSync(file)) {
+          console.log('$video', file)
+          this.deleteFiles(this.videoPath, /.jpg|.png/);
+          let process = new ffmpeg(file);
+          process.then((video) => {
+            video.fnExtractFrameToJPG(this.videoPath, {
+              every_n_frames: 150,
+              number: 5,
+              keep_pixel_aspect_ratio : true,
+              keep_aspect_ratio: true,
+              file_name : `image.jpg`
+            }, (err, files) => {
+              if(!err) {
+                console.log('video file: ', files);
+                observer.next(files);
+                observer.complete();        
+              } else {
+                console.log('video err: ', err);
+                observer.next();
+                observer.complete();    
+              }
+            })  
+          }, (err) => {
+            console.log('err: ', err);
+            observer.next([]);
+            observer.complete();
+          })
+        } else {
+          console.log(`${file} not found`)
+          observer.next([]);
+          observer.complete();    
+        }
+      } catch(e) {
+        console.log('error: ', e.msg);
+        observer.next([]);
+        observer.complete();
+      }
+    });
+  }
+  async checkNewModel () {
+    let files = readdirSync(this.newModelPath);
+    let list = files.filter(item => !(/(^|\/)\.[^\/\.]/g).test(item));
+    // console.log(files, list)
+    if(list.length > 0) {
+      clearInterval(this.timer);
+      await this.loadModel(this.newModelPath);
+      // this.setInterval(this.intervalMS);
+    }
+  }
+  setInterval(ms) {
+    this.timer = setInterval(async () => {
+      let mmsFiles = this.checkMMS(); 
+      if(mmsFiles && mmsFiles.length > 0) {
+        clearInterval(this.timer);
+        this.unzipMMS(mmsFiles)
+        .subscribe(async () => {
+          await this.checkNewModel();
+          this.setInterval(this.intervalMS);
+        }) 
+      } else {
+        await this.checkNewModel();
+        this.checkImage();
+      }
+    }, ms);
+  }
+  unzipMMS(files) {
+    return new Observable((observer) => {
+      let arg = '';
+      console.log('list', files);
+      files.forEach((file) => {
+        if(file === 'model.zip') {
+          arg = `unzip -o ${this.sharedPath}/${file} -d ${this.newModelPath}`;
+        } else if(file === 'image.zip') {
+          arg = `unzip -o ${this.sharedPath}/${file} -d ${this.imagePath}`;
+        } else {
+          observer.next();
+          observer.complete();
+        }
+        exec(arg, {maxBuffer: 1024 * 2000}, (err, stdout, stderr) => {
+          if(existsSync(`${this.sharedPath}/${file}`)) {
+            unlinkSync(`${this.sharedPath}/${file}`);
+          }
+          if(!err) {
+            observer.next();
+            observer.complete();
+          } else {
+            console.log(err);
+            observer.next();
+            observer.complete();
+          }
+        });
+      })
+    });    
+  }  
+  moveFiles(srcDir, destDir) {
+    return new Observable((observer) => {
+      let arg = `cp -r ${srcDir}/* ${destDir}`;
+      if(srcDir === this.newModelPath) {
+        arg += ` && rm -rf ${srcDir}/*`;
+      }
+      exec(arg, {maxBuffer: 1024 * 2000}, (err, stdout, stderr) => {
+        if(!err) {
+          observer.next();
+          observer.complete();
+        } else {
+          console.log(err);
+          observer.next();
+          observer.complete();
+        }
+      });
+    });    
+  }
+  getFiles(srcDir, ext) {
+    let files = readdirSync(srcDir);
+    return files.map((file) => {
+      if(ext && file.match(ext)) {
+        return `${srcDir}/${file}`;
+      }
+    });  
+  }
+  deleteFiles(srcDir, ext) {
+    let files = readdirSync(srcDir);
+    files.forEach((file) => {
+      if(ext && file.match(ext)) {
+        unlinkSync(`${this.videoPath}/${file}`)
+      }
+    });
+  }
+  removeFiles(srcDir) {
+    let arg = `rm -rf ${srcDir}/*`;
+    return this.shell(arg)
+  }
+  renameFile(from, to) {
+    if(existsSync(from)) {
+      renameSync(from, to);
+    }    
+  }
+  shell(arg: string, success='command executed successfully', error='command failed', prnStdout=true, options={maxBuffer: 1024 * 2000}) {
+    return new Observable((observer) => {
+      console.log(arg);
+      if(!prnStdout) {
+        options = Object.assign(options, {stdio: 'pipe', encoding: 'utf8'})
+      }
+      exec(arg, options, (err: any, stdout: any, stderr: any) => {
+        if(!err) {
+          if(prnStdout) {
+            console.log(stdout);
+          }
+          console.log(success);
+          observer.next(stdout);
+          observer.complete();
+        } else {
+          console.log(`${error}: ${err}`);
+          observer.error(err);
+        }
+      })  
+    });
+  }
+  async loadModel(modelPath) {
+    try {
+      let newVersion = jsonfile.readFileSync(`${modelPath}/assets/version.json`);
+      if(this.version && this.version.version === newVersion.version) {
+        this.removeFiles(modelPath)
+        .subscribe(() => {
+          this.resetTimer();
+        });
+      }
+      else if(modelPath === this.newModelPath || modelPath === this.localPath) {
+        console.log('iam new')
+        this.moveFiles(this.currentModelPath, this.oldModelPath)
+        .subscribe({
+          next: (v) => this.moveFiles(this.newModelPath, this.currentModelPath)
+            .subscribe({
+              next: (v) => {
+                
+                  console.log('new model is available, restarting server...');
+                  process.exit(0);
+                
+              },   
+              error: (e) => {
+                console.log('reset timer');
+                this.resetTimer(); 
+              }
+            }),  
+          error: (e) => {
+            console.log('reset timer');
+            this.resetTimer(); 
+          }
+        })
+      } else if(modelPath !== this.newModelPath){
+        const startTime = tfnode.util.now();
+        this.model = await tfnode.node.loadSavedModel(modelPath);
+        const endTime = tfnode.util.now();
 
+        console.log(`loading time:  ${modelPath}, ${endTime-startTime}`);
+        this.labels = jsonfile.readFileSync(`${modelPath}/assets/labels.json`);
+        this.version = jsonfile.readFileSync(`${modelPath}/assets/version.json`);
+        console.log('version: ', this.version)
+
+        let images = this.getFiles(this.videoPath, /.jpg|.png/);
+        console.log(images)
+        this.inferenceVideo(images);      
+      }
+    } catch(e) {
+      console.log(e);
+      if(modelPath === this.newModelPath) {
+        this.removeFiles(modelPath)
+        .subscribe(() => {
+          console.log('modelpath', modelPath)
+          this.loadModel(this.currentModelPath);
+        })
+      } else if(modelPath === this.currentModelPath) {
+        this.loadModel(this.oldModelPath);
+      } else {
+        console.log('PANIC! no good model to load');
+      }
+      this.resetTimer();
+    }
+  }
 }  

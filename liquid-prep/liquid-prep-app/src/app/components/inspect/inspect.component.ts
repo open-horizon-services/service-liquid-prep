@@ -18,6 +18,9 @@ export class InspectComponent implements OnInit {
   @ViewChild('front_camera', {static: false, read: ElementRef})
   frontCamera: ElementRef;
 
+  columns: string[] = ['label', 'score', 'min', 'max'];
+  dataSource: any[] = [];
+
   isCameraDisabled = false;
   cameraOn = true;
   webcamImage: WebcamImage = null;
@@ -59,6 +62,9 @@ export class InspectComponent implements OnInit {
     .then((mediaDevices: MediaDeviceInfo[]) => {
       this.multipleWebcamsAvailable = mediaDevices && mediaDevices.length > 1;
     });
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 0)
 
   }
 
@@ -248,7 +254,7 @@ export class InspectComponent implements OnInit {
       })
       image.dataSource = dataSource;
     });
-    img.src = `${this.host}${image.name}?${new Date().getTime()}`;
+    img.src = `${image.name}?${new Date().getTime()}`;
 
   }
   drawBBox() {
