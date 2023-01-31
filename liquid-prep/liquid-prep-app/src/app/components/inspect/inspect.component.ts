@@ -52,7 +52,7 @@ export class InspectComponent implements OnInit {
       this.lastActive = Date.now();
       this.resetTimer();
     }, true);
-    this.host = location.host;
+    this.host = `${location.protocol}${location.host}`;
     //this.isCameraDisabled = location.hostname.indexOf('localhost') < 0 && location.protocol !== 'https';
 
     WebcamUtil.getAvailableVideoInputs()
@@ -141,7 +141,7 @@ export class InspectComponent implements OnInit {
   }
   setInterval(ms: number) {
     this.timer = setInterval(async () => {
-      this.loadJson(`${this.host}/static/js/image.json`);
+      this.loadJson(`/static/js/image.json`);
     }, ms);
   }
   resetTimer() {
@@ -161,7 +161,7 @@ export class InspectComponent implements OnInit {
           console.log(data)
           if(data) {
             if(data.outdated === true) {
-              this.http.get(`${this.host}/init`)
+              this.http.get(`/init`)
               .subscribe((data) => {
                 this.resetTimer();
                 this.loadJson(file);
@@ -263,7 +263,7 @@ export class InspectComponent implements OnInit {
     clearInterval(this.timer);
     let formData = new FormData();
     formData.append('imageFile', imageFile);
-    this.http.post<any>(`${this.host}/upload`, formData)
+    this.http.post<any>(`/upload`, formData)
     .subscribe((res) => {
       console.log(res)
       console.log(`${imageFile.name} uploaded successfully.`)

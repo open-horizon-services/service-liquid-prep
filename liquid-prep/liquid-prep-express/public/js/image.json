@@ -1,0 +1,27 @@
+{
+  "images": {
+    "/static/images/image-old.png": {
+      "bbox": [
+        {
+          "detectedBox": [
+            "0.03",
+            "0.33",
+            "0.21",
+            "0.54"
+          ],
+          "detectedClass": "hard-hat",
+          "detectedScore": "1.00"
+        }
+      ],
+      "elapsedTime": 1320.5508120059967
+    }
+  },
+  "version": {
+    "name": "Demo model",
+    "version": "1.0.0"
+  },
+  "confidentCutoff": 0.85,
+  "platform": "darwin:x64",
+  "cameraDisabled": false,
+  "remoteCamerasOn": "false"
+}

@@ -12,9 +12,14 @@ export class Utils {
   currentModelPath = './model';
   newModelPath = './model-new';
   oldModelPath = './model-old';
+  staticPath = './public/js';
   sharedPath = '';
   intervalMS = 10000;
   timer: NodeJS.Timer = null;
+  state = {
+    server: null,
+    sockets: [],
+  };
 
   constructor(private server: any, private port: number) {
     this.init()
@@ -41,6 +46,9 @@ export class Utils {
     }
     if(!existsSync(this.newModelPath)) {
       mkdirSync(this.newModelPath);
+    }
+    if(!existsSync(this.oldModelPath)) {
+      mkdirSync(this.oldModelPath);
     }
     if(!existsSync(this.oldModelPath)) {
       mkdirSync(this.oldModelPath);
@@ -74,8 +82,19 @@ export class Utils {
     require('dns').lookup(require('os').hostname(), (err, add, fam) => {
       console.log(`The WebSocket server is running on ${add}:${this.port}`);
     })
-    this.server.listen(this.port, () => {
+    this.state.server = this.server.listen(this.port, () => {
       console.log(`Started on ${this.port}`);
     });
+    this.state.server.on('connection', (socket) => {
+      //this.state.sockets.forEach((socket, index) => {
+      //  if (socket.destroyed === false) {
+      //    socket.destroy();
+      //  }
+      //});
+      //this.state.sockets = []
+      //this.state.sockets.push(socket);
+      //console.log('Socket added: ', this.state.sockets.length)
+    })
   }
+
 }  

@@ -27,7 +27,7 @@
       var sock;
       function connectSocket(msg = null) {
         //var sock =new WebSocket("ws://localhost:5001");
-        sock = new WebSocket("ws://192.168.86.24:3000"); //replace this address with the one the node.js server prints out. keep port 3000
+        sock = new WebSocket(`ws://192.168.86.24:${location.port}`); //replace this address with the one the node.js server prints out. keep port 3000
 
         sock.onopen = function (event) {
           //alert("Socket connected succesfully!!!")
