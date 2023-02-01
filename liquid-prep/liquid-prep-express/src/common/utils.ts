@@ -1,9 +1,13 @@
-import { Observable, Subject, forkJoin } from 'rxjs';
-import { existsSync, mkdirSync, unlinkSync, stat, renameSync, readdirSync, copyFileSync, readFileSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync } from 'fs';
+import { forkJoin, Observable } from 'rxjs';
 import WebSocket from 'ws';
+
 const ffmpeg = require('ffmpeg');
 const tfnode = require('@tensorflow/tfjs-node');
 const jsonfile = require('jsonfile');
+const cp = require('child_process'),
+exec = cp.exec;
+
 
 export class Utils {
   homePath = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
@@ -116,26 +120,6 @@ export class Utils {
     this.timer = null;
     this.setInterval(this.intervalMS);  
   }
-  checkMMS() {
-    try {
-      let list;
-      let config;
-      if(existsSync(this.mmsPath)) {
-        list = readdirSync(this.mmsPath);
-        list = list.filter(item => /(\.zip)$/.test(item));
-        this.sharedPath = this.mmsPath;  
-      } else if(existsSync(this.localPath)) {
-        list = readdirSync(this.localPath);
-        config = list.filter(item => item === 'config.json');
-        list = list.filter(item => /(\.zip)$/.test(item));
-        this.sharedPath = this.localPath;
-      }
-      this.checkVideo();
-      return list;  
-    } catch(e) {
-      console.log(e)
-    }
-  }
   getVideoFile(file) {
     let video = undefined;
     this.videoFormat.every((ext) => {
@@ -160,7 +144,13 @@ export class Utils {
           let cycles = 0;
           console.log(imageFile)
           const image = readFileSync(imageFile);
-          const decodedImage = tfnode.node.decodeImage(new Uint8Array(image), 3);
+          //const decodedImage = tfnode.node.decodeImage(new Uint8Array(image), 3);
+          let decodedImage = tfnode.node.decodeImage(image, 3);
+          switch(this.version.type) {
+            case 'float':
+              decodedImage = parseFloat(decodedImage)
+              break; 
+          }
           const inputTensor = decodedImage.expandDims(0);
           this.inference(inputTensor)
           .subscribe((json) => {
@@ -212,7 +202,11 @@ export class Utils {
   inference(inputTensor) {
     return new Observable((observer) => {
       const startTime = tfnode.util.now();
-      let outputTensor = this.model.predict({input_tensor: inputTensor});
+      // input_tensor worked for worker safety
+      let input = this.version.input && this.version.input.length > 0 ? this.version.input : 'input_tensor';
+      let tensor = {};
+      tensor[input] = inputTensor; 
+      let outputTensor = this.model.predict(tensor);
       const scores = outputTensor['detection_scores'].arraySync();
       const boxes = outputTensor['detection_boxes'].arraySync();
       const classes = outputTensor['detection_classes'].arraySync();
@@ -315,7 +309,7 @@ export class Utils {
   async checkNewModel () {
     let files = readdirSync(this.newModelPath);
     let list = files.filter(item => !(/(^|\/)\.[^\/\.]/g).test(item));
-    // console.log(files, list)
+    console.log(files, list)
     if(list.length > 0) {
       clearInterval(this.timer);
       await this.loadModel(this.newModelPath);
@@ -338,6 +332,32 @@ export class Utils {
       }
     }, ms);
   }
+  checkMMS() {
+    try {
+      let list;
+      let config;
+      if(existsSync(this.mmsPath)) {
+        list = readdirSync(this.mmsPath);
+        list = list.filter(item => /(\.zip)$/.test(item));
+        this.sharedPath = this.mmsPath;  
+      } else if(existsSync(this.localPath)) {
+        list = readdirSync(this.localPath);
+        config = list.filter(item => item === 'config.json');
+        list = list.filter(item => /(\.zip)$/.test(item));
+        this.sharedPath = this.localPath;
+      }
+      this.checkVideo();
+      return list;  
+    } catch(e) {
+      console.log(e)
+    }
+  }
+  tidyUnzippedfiles() {
+    let newModel = existsSync(`${this.newModelPath}/model`) ? `${this.newModelPath}/model` : this.newModelPath;
+    if(existsSync(`${this.newModelPath}/model`)) {
+      let arg = `mv `
+    }
+  }
   unzipMMS(files) {
     return new Observable((observer) => {
       let arg = '';
@@ -351,19 +371,33 @@ export class Utils {
           observer.next();
           observer.complete();
         }
-        exec(arg, {maxBuffer: 1024 * 2000}, (err, stdout, stderr) => {
-          if(existsSync(`${this.sharedPath}/${file}`)) {
-            unlinkSync(`${this.sharedPath}/${file}`);
-          }
-          if(!err) {
+        this.shell(arg)
+        .subscribe({
+          complete: () => {
+            if(existsSync(`${this.sharedPath}/${file}`)) {
+              unlinkSync(`${this.sharedPath}/${file}`);
+            }
+
             observer.next();
             observer.complete();
-          } else {
-            console.log(err);
+          }, error: (err) => {
             observer.next();
             observer.complete();
           }
-        });
+        })
+        //exec(arg, {maxBuffer: 1024 * 2000}, (err, stdout, stderr) => {
+        //  if(existsSync(`${this.sharedPath}/${file}`)) {
+        //    unlinkSync(`${this.sharedPath}/${file}`);
+        //  }
+        //  if(!err) {
+        //    observer.next();
+        //    observer.complete();
+        //  } else {
+        //    console.log(err);
+        //    observer.next();
+        //    observer.complete();
+        //  }
+        //});
       })
     });    
   }  
@@ -432,9 +466,11 @@ export class Utils {
     });
   }
   async loadModel(modelPath) {
+    //https://yu-ishikawa.medium.com/how-to-show-signatures-of-tensorflow-saved-model-5ac56cf1960f
+    //https://www.tensorflow.org/guide/saved_model#show_command
     try {
       let newVersion = jsonfile.readFileSync(`${modelPath}/assets/version.json`);
-      if(this.version && this.version.version === newVersion.version) {
+      if(this.version && this.version.version === newVersion.version && this.version.name === newVersion.name) {
         this.removeFiles(modelPath)
         .subscribe(() => {
           this.resetTimer();
@@ -444,19 +480,21 @@ export class Utils {
         console.log('iam new')
         this.moveFiles(this.currentModelPath, this.oldModelPath)
         .subscribe({
-          next: (v) => this.moveFiles(this.newModelPath, this.currentModelPath)
+          next: (v) => {
+            let newModel = existsSync(`${this.newModelPath}/model`) ? `${this.newModelPath}/model` : this.newModelPath;
+            this.moveFiles(newModel, this.currentModelPath)
             .subscribe({
               next: (v) => {
-                
-                  console.log('new model is available, restarting server...');
-                  process.exit(0);
-                
+                console.log('new model is available, restarting server...');
+                this.loadModel(modelPath)
+                //process.exit(0);                
               },   
               error: (e) => {
                 console.log('reset timer');
                 this.resetTimer(); 
               }
-            }),  
+            })
+          },  
           error: (e) => {
             console.log('reset timer');
             this.resetTimer(); 
@@ -474,7 +512,8 @@ export class Utils {
 
         let images = this.getFiles(this.videoPath, /.jpg|.png/);
         console.log(images)
-        this.inferenceVideo(images);      
+        this.inferenceVideo(images);
+        this.resetTimer();       
       }
     } catch(e) {
       console.log(e);

@@ -4,21 +4,23 @@
       "bbox": [
         {
           "detectedBox": [
-            "0.46",
-            "0.50",
-            "0.75",
-            "0.86"
+            "0.00",
+            "0.00",
+            "0.94",
+            "1.00"
           ],
-          "detectedClass": "hard-hat",
-          "detectedScore": "0.93"
+          "detectedClass": "person",
+          "detectedScore": "0.96"
         }
       ],
-      "elapsedTime": 137.2474170923233
+      "elapsedTime": 2554.9403750002384
     }
   },
   "version": {
     "name": "Demo model",
-    "version": "1.0.0"
+    "version": "2.0.0",
+    "input": "input_tensor",
+    "type": ""
   },
   "confidentCutoff": 0.85,
   "platform": "darwin:arm64"
