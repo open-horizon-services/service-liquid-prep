@@ -146,19 +146,26 @@ export class Utils {
           const image = readFileSync(imageFile);
           //const decodedImage = tfnode.node.decodeImage(new Uint8Array(image), 3);
           let decodedImage = tfnode.node.decodeImage(image, 3);
+          let inputTensor;
           switch(this.version.type) {
             case 'float':
-              decodedImage = parseFloat(decodedImage)
-              break; 
+              inputTensor = parseFloat(decodedImage)
+              break;
+            default:
+              inputTensor = decodedImage.expandDims();
+              break;
           }
-          const inputTensor = decodedImage.expandDims(0);
           this.inference(inputTensor)
-          .subscribe((json) => {
-            let images = {};
-            images['/static/images/image-old.png'] = json;
-            json = Object.assign({images: images, version: this.version, confidentCutoff: this.confidentCutoff, platform: `${process.platform}:${process.arch}`});
-            jsonfile.writeFile(`${this.staticPath}/image.json`, json, {spaces: 2});
-            this.renameFile(imageFile, `${this.imagePath}/image-old.png`);
+          .subscribe({
+              next: (json) => {
+              let images = {};
+              images['/static/images/image-old.png'] = json;
+              json = Object.assign({images: images, version: this.version, confidentCutoff: this.confidentCutoff, platform: `${process.platform}:${process.arch}`});
+              jsonfile.writeFile(`${this.staticPath}/image.json`, json, {spaces: 2});
+              this.renameFile(imageFile, `${this.imagePath}/image-old.png`);
+            }, error: (err) => {
+
+            }
           });
         } catch(e) {
           console.log(e);
@@ -201,39 +208,45 @@ export class Utils {
   }
   inference(inputTensor) {
     return new Observable((observer) => {
-      const startTime = tfnode.util.now();
-      // input_tensor worked for worker safety
-      let input = this.version.input && this.version.input.length > 0 ? this.version.input : 'input_tensor';
-      let tensor = {};
-      tensor[input] = inputTensor; 
-      let outputTensor = this.model.predict(tensor);
-      const scores = outputTensor['detection_scores'].arraySync();
-      const boxes = outputTensor['detection_boxes'].arraySync();
-      const classes = outputTensor['detection_classes'].arraySync();
-      const num = outputTensor['num_detections'].arraySync();
-      const endTime = tfnode.util.now();
-      outputTensor['detection_scores'].dispose();
-      outputTensor['detection_boxes'].dispose();
-      outputTensor['detection_classes'].dispose();
-      outputTensor['num_detections'].dispose();
-      
-      let predictions = [];
-      const elapsedTime = endTime - startTime;
-      for (let i = 0; i < scores[0].length; i++) {
-        let score = scores[0][i].toFixed(2);
-        if (score >= this.confidentCutoff) {
-          predictions.push({
-            detectedBox: boxes[0][i].map((el)=>el.toFixed(2)),
-            detectedClass: this.labels[classes[0][i]],
-            detectedScore: score
-          });
+      try {
+        const startTime = tfnode.util.now();
+        // input_tensor worked for worker safety
+        let input = this.version.input && this.version.input.length > 0 ? this.version.input : 'input_tensor';
+        let tensor = {};
+        tensor[input] = inputTensor; 
+        //console.log(input, tensor)
+        let outputTensor = this.model.predict(tensor);
+        const scores = outputTensor['detection_scores'].arraySync();
+        const boxes = outputTensor['detection_boxes'].arraySync();
+        const classes = outputTensor['detection_classes'].arraySync();
+        const num = outputTensor['num_detections'].arraySync();
+        const endTime = tfnode.util.now();
+        outputTensor['detection_scores'].dispose();
+        outputTensor['detection_boxes'].dispose();
+        outputTensor['detection_classes'].dispose();
+        outputTensor['num_detections'].dispose();
+        
+        let predictions = [];
+        const elapsedTime = endTime - startTime;
+        for (let i = 0; i < scores[0].length; i++) {
+          let score = scores[0][i].toFixed(2);
+          if (score >= this.confidentCutoff) {
+            predictions.push({
+              detectedBox: boxes[0][i].map((el)=>el.toFixed(2)),
+              detectedClass: this.labels[classes[0][i]],
+              detectedScore: score
+            });
+          }
         }
+        console.log('predictions:', predictions.length, predictions[0]);
+        console.log('time took: ', elapsedTime);
+        console.log('build json...');
+        observer.next({bbox: predictions, elapsedTime: elapsedTime});
+        observer.complete();    
+      } catch(e) {
+        console.log(e)
+        observer.error(e)
       }
-      console.log('predictions:', predictions.length, predictions[0]);
-      console.log('time took: ', elapsedTime);
-      console.log('build json...');
-      observer.next({bbox: predictions, elapsedTime: elapsedTime});
-      observer.complete();  
     });
   }
   inferenceVideo(files) {
@@ -309,7 +322,7 @@ export class Utils {
   async checkNewModel () {
     let files = readdirSync(this.newModelPath);
     let list = files.filter(item => !(/(^|\/)\.[^\/\.]/g).test(item));
-    console.log(files, list)
+    console.log('here', files, list)
     if(list.length > 0) {
       clearInterval(this.timer);
       await this.loadModel(this.newModelPath);
@@ -352,12 +365,6 @@ export class Utils {
       console.log(e)
     }
   }
-  tidyUnzippedfiles() {
-    let newModel = existsSync(`${this.newModelPath}/model`) ? `${this.newModelPath}/model` : this.newModelPath;
-    if(existsSync(`${this.newModelPath}/model`)) {
-      let arg = `mv `
-    }
-  }
   unzipMMS(files) {
     return new Observable((observer) => {
       let arg = '';
@@ -377,7 +384,6 @@ export class Utils {
             if(existsSync(`${this.sharedPath}/${file}`)) {
               unlinkSync(`${this.sharedPath}/${file}`);
             }
-
             observer.next();
             observer.complete();
           }, error: (err) => {
@@ -385,19 +391,6 @@ export class Utils {
             observer.complete();
           }
         })
-        //exec(arg, {maxBuffer: 1024 * 2000}, (err, stdout, stderr) => {
-        //  if(existsSync(`${this.sharedPath}/${file}`)) {
-        //    unlinkSync(`${this.sharedPath}/${file}`);
-        //  }
-        //  if(!err) {
-        //    observer.next();
-        //    observer.complete();
-        //  } else {
-        //    console.log(err);
-        //    observer.next();
-        //    observer.complete();
-        //  }
-        //});
       })
     });    
   }  
@@ -405,7 +398,7 @@ export class Utils {
     return new Observable((observer) => {
       let arg = `cp -r ${srcDir}/* ${destDir}`;
       if(srcDir === this.newModelPath) {
-        arg += ` && rm -rf ${srcDir}/*`;
+        arg += ` && rm -rf ${srcDir}/{,.[!.],..?}*`;
       }
       exec(arg, {maxBuffer: 1024 * 2000}, (err, stdout, stderr) => {
         if(!err) {
@@ -469,37 +462,36 @@ export class Utils {
     //https://yu-ishikawa.medium.com/how-to-show-signatures-of-tensorflow-saved-model-5ac56cf1960f
     //https://www.tensorflow.org/guide/saved_model#show_command
     try {
-      let newVersion = jsonfile.readFileSync(`${modelPath}/assets/version.json`);
-      if(this.version && this.version.version === newVersion.version && this.version.name === newVersion.name) {
-        this.removeFiles(modelPath)
-        .subscribe(() => {
-          this.resetTimer();
-        });
-      }
-      else if(modelPath === this.newModelPath || modelPath === this.localPath) {
-        console.log('iam new')
-        this.moveFiles(this.currentModelPath, this.oldModelPath)
-        .subscribe({
-          next: (v) => {
-            let newModel = existsSync(`${this.newModelPath}/model`) ? `${this.newModelPath}/model` : this.newModelPath;
-            this.moveFiles(newModel, this.currentModelPath)
-            .subscribe({
-              next: (v) => {
-                console.log('new model is available, restarting server...');
-                this.loadModel(modelPath)
-                //process.exit(0);                
-              },   
-              error: (e) => {
-                console.log('reset timer');
-                this.resetTimer(); 
-              }
-            })
-          },  
-          error: (e) => {
-            console.log('reset timer');
-            this.resetTimer(); 
-          }
-        })
+      if(modelPath === this.newModelPath || modelPath === this.localPath) {
+        let newVersion = jsonfile.readFileSync(`${modelPath}/assets/version.json`);
+        if(this.version && this.version.version === newVersion.version && this.version.name === newVersion.name) {
+          this.removeFiles(modelPath)
+          .subscribe(() => {
+            this.resetTimer();
+          });
+        } else {
+          console.log('iam new')
+          this.moveFiles(this.currentModelPath, this.oldModelPath)
+          .subscribe({
+            next: (v) => {
+              this.moveFiles(this.newModelPath, this.currentModelPath)
+              .subscribe({
+                next: (v) => {
+                  console.log('new model is available, restarting server...');
+                  process.exit(0);                
+                },   
+                error: (e) => {
+                  console.log('reset timer');
+                  this.resetTimer(); 
+                }
+              })
+            },  
+            error: (e) => {
+              console.log('reset timer');
+              this.resetTimer(); 
+            }
+          })  
+        }
       } else if(modelPath !== this.newModelPath){
         const startTime = tfnode.util.now();
         this.model = await tfnode.node.loadSavedModel(modelPath);
@@ -517,17 +509,17 @@ export class Utils {
       }
     } catch(e) {
       console.log(e);
-      if(modelPath === this.newModelPath) {
-        this.removeFiles(modelPath)
-        .subscribe(() => {
-          console.log('modelpath', modelPath)
-          this.loadModel(this.currentModelPath);
-        })
-      } else if(modelPath === this.currentModelPath) {
-        this.loadModel(this.oldModelPath);
-      } else {
-        console.log('PANIC! no good model to load');
-      }
+      //if(modelPath === this.newModelPath) {
+      //  this.removeFiles(modelPath)
+      //  .subscribe(() => {
+      //    console.log('modelpath', modelPath)
+      //    this.loadModel(this.currentModelPath);
+      //  })
+      //} else if(modelPath === this.currentModelPath) {
+      //  this.loadModel(this.oldModelPath);
+      //} else {
+      //  console.log('PANIC! no good model to load');
+      //}
       this.resetTimer();
     }
   }
