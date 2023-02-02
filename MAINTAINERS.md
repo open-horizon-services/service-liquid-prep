@@ -6,4 +6,4 @@ See the information about [community membership roles](https://wiki.lfedge.org/d
 | Name           | GitHub          | email                    |
 | -------------- | --------------- | ------------------------ |
 | Troy Fine      | t-fine          | <troy.fine@ibm.com>      |
-| Jeff Lu        | playground      | <jeff.lu@ibm.com>        |
+| Jeff Lu        | playground      | <ljeff@us.ibm.com>       |
