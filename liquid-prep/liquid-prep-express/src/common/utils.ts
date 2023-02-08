@@ -406,9 +406,9 @@ export class Utils {
       console.log('list', files);
       files.forEach((file) => {
         if(file === 'model.zip') {
-          arg = `unzip -o ${this.sharedPath}/${file} -d ${this.newModelPath}`;
+          arg = `unzip -o ${this.sharedPath}/${file} -d ${this.newModelPath} -x "__MACOSX/*"`;
         } else if(file === 'image.zip') {
-          arg = `unzip -o ${this.sharedPath}/${file} -d ${this.imagePath}`;
+          arg = `unzip -o ${this.sharedPath}/${file} -d ${this.imagePath} -x "__MACOSX/*"`;
         } else {
           observer.next();
           observer.complete();
