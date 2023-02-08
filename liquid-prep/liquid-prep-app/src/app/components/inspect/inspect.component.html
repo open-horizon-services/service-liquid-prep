@@ -14,7 +14,7 @@
       >
         <mat-icon>home</mat-icon>
       </button>
-      <button
+      <!--<button
         class="vertical-align-middle"
         mat-icon-button
         color="primary"
@@ -23,13 +23,13 @@
         [disabled]="isCameraDisabled"
       >
         <mat-icon #front_camera>camera_front</mat-icon>
-      </button>
+      </button>-->
 
       <button
         class="vertical-align-middle"
         mat-icon-button
         color="primary"
-        (click)="showNextWebcam(true)"
+        (click)="triggerSnapshot()"
         title="Switch Camera"
         [disabled]="isCameraDisabled"
       >
@@ -40,6 +40,32 @@
 </div>
 
 <mat-card #mat_card class="hzn-card">
+  <mat-card-subtitle style="margin-top: 1px">
+    <span>
+      <mat-form-field appearance="outline" class="hzn-form-field-select">
+        <mat-label class="hzn-label">Score</mat-label>
+        <mat-select [(value)]="cutoff" class="hzn-mat-select">
+          <mat-option
+            *ngFor="let score of scores"
+            [value]="score"
+            (onSelectionChange)="onScoreChange($event)"
+            >{{ score }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="hzn-form-field-select">
+        <mat-label class="hzn-label">Models</mat-label>
+        <mat-select [(value)]="defaultModel" class="hzn-mat-select">
+          <mat-option
+            *ngFor="let model of models"
+            [value]="model"
+            (onSelectionChange)="onModelChange($event)"
+            >{{ model }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+    </span>
+  </mat-card-subtitle>
   <mat-card-header #mat_card_header>
     <mat-card-content #mat_card_content class="hzn-card-content">
       <div class="wrapper">
@@ -55,48 +81,53 @@
           (initError)="handleInitError($event)"
         ></webcam>
       </div>
-      
-      <mat-card-subtitle style="margin-bottom:5px;">{{platform}}</mat-card-subtitle>
+
+      <mat-card-subtitle style="margin-bottom: 5px">{{
+        platform
+      }}</mat-card-subtitle>
 
       <div *ngFor="let image of images">
-
         <!-- <canvas #canvas *ngIf="showCanvas"></canvas> -->
         <canvas [className]="image.class"></canvas>
 
-        <table mat-table [dataSource]="image.dataSource" class="mat-elevation-z8">
-
+        <table
+          mat-table
+          [dataSource]="image.dataSource"
+          class="mat-elevation-z8"
+        >
           <!--- Note that these columns can be defined in any order.
                 The actual rendered columns are set as a property on the row definition" -->
 
           <!-- Label Column -->
           <ng-container matColumnDef="label">
-            <th mat-header-cell *matHeaderCellDef> Label </th>
-            <td mat-cell *matCellDef="let element"> {{element.label}} </td>
+            <th mat-header-cell *matHeaderCellDef>Label</th>
+            <td mat-cell *matCellDef="let element">{{ element.label }}</td>
           </ng-container>
 
           <!-- Score Column -->
           <ng-container matColumnDef="score">
-            <th mat-header-cell *matHeaderCellDef> Score </th>
-            <td mat-cell *matCellDef="let element"> {{element.score}} </td>
+            <th mat-header-cell *matHeaderCellDef>Score</th>
+            <td mat-cell *matCellDef="let element">{{ element.score }}</td>
           </ng-container>
 
           <!-- Min Pos Column -->
           <ng-container matColumnDef="min">
-            <th mat-header-cell *matHeaderCellDef> Min Pos </th>
-            <td mat-cell *matCellDef="let element"> {{element.min}} </td>
+            <th mat-header-cell *matHeaderCellDef>Min Pos</th>
+            <td mat-cell *matCellDef="let element">{{ element.min }}</td>
           </ng-container>
 
           <!-- Max Pos Column -->
           <ng-container matColumnDef="max">
-            <th mat-header-cell *matHeaderCellDef> Max Pos </th>
-            <td mat-cell *matCellDef="let element"> {{element.max}} </td>
+            <th mat-header-cell *matHeaderCellDef>Max Pos</th>
+            <td mat-cell *matCellDef="let element">{{ element.max }}</td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="columns"></tr>
-          <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
         </table>
-        <mat-card-subtitle style="margin-bottom:5px;margin-top:3px;">{{image.infoText}}</mat-card-subtitle>
-
+        <mat-card-subtitle style="margin-bottom: 5px; margin-top: 3px">{{
+          image.infoText
+        }}</mat-card-subtitle>
       </div>
     </mat-card-content>
   </mat-card-header>

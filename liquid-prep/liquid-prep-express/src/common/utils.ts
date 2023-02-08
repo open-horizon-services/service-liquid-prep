@@ -1,5 +1,5 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync } from 'fs';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, Subject } from 'rxjs';
 import WebSocket from 'ws';
 
 const ffmpeg = require('ffmpeg');
@@ -20,6 +20,7 @@ export class Utils {
   currentModelPath = './model';
   newModelPath = './model-new';
   oldModelPath = './model-old';
+  stockModelPath = './ml-models';
   staticPath = './public/js';
   backupPath = './public/backup';
   oldImage = `./public/images/image-old.png`;
@@ -28,7 +29,8 @@ export class Utils {
   timer: NodeJS.Timer = null;
   videoFormat = ['.mp4', '.avi', '.webm'];
   videoSrc = '/static/backup/video-old.mp4';
-  confidentCutoff = 0.85;
+  confidentCutoff = 0.5;
+  assetType = 'Image';
   model;
   labels;
   version;
@@ -36,6 +38,39 @@ export class Utils {
     server: null,
     sockets: [],
   };
+  $score = new Subject().asObservable().subscribe((data:any) => {
+    if(data.name == 'score') {
+      this.confidentCutoff = parseFloat(data.score);
+      console.log('subscribe: ', data)
+      this.assetType = data.assetType; 
+      if(data.assetType === 'Image') {
+        this.renameFile(this.oldImage, `${this.imagePath}/image.png`);  
+      } else {
+        let images = this.getFiles(this.videoPath, /.jpg|.png/);
+        console.log(images)
+        this.inferenceVideo(images);  
+      } 
+    }
+  });
+  $model = new Subject().asObservable().subscribe((data:any) => {
+    if(data.name == 'model') {
+      let model = data.model.toLowerCase();
+      console.log('subscribe: ', data)
+      this.assetType = data.assetType;
+      let arg = `cp ${this.stockModelPath}/${model}/model.zip ${this.sharedPath} && cp ${this.stockModelPath}/${model}/image.png ${this.imagePath} `;
+      this.shell(arg)
+      .subscribe(() => {
+        if(data.assetType === 'Image') {
+          this.checkImage();
+          //this.renameFile(this.oldImage, `${this.imagePath}/image.png`);  
+        } else {
+          let images = this.getFiles(this.videoPath, /.jpg|.png/);
+          console.log(images)
+          this.inferenceVideo(images);  
+        }   
+      })
+    }
+  });
 
   constructor(private server: any, private port: number) {
     this.init()
@@ -149,10 +184,10 @@ export class Utils {
           let inputTensor;
           switch(this.version.type) {
             case 'float':
-              inputTensor = parseFloat(decodedImage)
+              inputTensor = decodedImage.expandDims(0).cast('float32');
               break;
             default:
-              inputTensor = decodedImage.expandDims();
+              inputTensor = decodedImage.expandDims(0);
               break;
           }
           this.inference(inputTensor)
@@ -160,7 +195,7 @@ export class Utils {
               next: (json) => {
               let images = {};
               images['/static/images/image-old.png'] = json;
-              json = Object.assign({images: images, version: this.version, confidentCutoff: this.confidentCutoff, platform: `${process.platform}:${process.arch}`});
+              json = Object.assign({images: images, version: this.version, confidentCutoff: this.confidentCutoff, platform: `${process.platform}:${process.arch}`, timestamp: Date.now()});
               jsonfile.writeFile(`${this.staticPath}/image.json`, json, {spaces: 2});
               this.renameFile(imageFile, `${this.imagePath}/image-old.png`);
             }, error: (err) => {

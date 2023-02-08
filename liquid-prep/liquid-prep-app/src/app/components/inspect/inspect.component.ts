@@ -1,6 +1,12 @@
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import {
+  MatSnackBar,
+  MatSnackBarConfig,
+  MatSnackBarHorizontalPosition,
+  MatSnackBarVerticalPosition,
+} from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
 import { Observable, Subject } from 'rxjs';
@@ -20,6 +26,7 @@ export class InspectComponent implements OnInit {
 
   columns: string[] = ['label', 'score', 'min', 'max'];
   dataSource: any[] = [];
+  assetType = 'Image';
 
   isCameraDisabled = false;
   cameraOn = true;
@@ -33,6 +40,9 @@ export class InspectComponent implements OnInit {
   showWebcam = true;
   host: string;
   lastActive: number;
+  scores: string[] = ['0.95', '0.90', '0.85', '0.80', '0.75', '0.70', '0.65', '0.60', '0.55', '0.50', '0.45', '0.40', '0.35', '0.30', '0.25', '0.20', '0.15', '0.10'];
+  models: string[] = ['Insects', 'Plants', 'Worker-Safety'];
+  defaultModel: string;
   cutoff: string;
   images: any[] = [];
   platform: string = '';
@@ -44,10 +54,13 @@ export class InspectComponent implements OnInit {
   deviceId: string;
   multipleWebcamsAvailable = false;
   errors: WebcamInitError[] = [];
+  horizontalPosition: MatSnackBarHorizontalPosition = 'center';
+  verticalPosition: MatSnackBarVerticalPosition = 'bottom';
 
   constructor(
     private router: Router, private location: Location,
     private http: HttpClient,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit(): void {
@@ -79,13 +92,37 @@ export class InspectComponent implements OnInit {
   @HostListener('window:resize', ['$event'])
   onResize(event?:any) {
     if(this.cameraOn) {
-      this.getMatCardSize();
-      this.drawComponent();
+      if(this.getMatCardSize()) {
+        this.drawComponent();
+      }
     }
   }
   getMatCardSize() {
-    this.cameraHeight = this.matCardHeight = this.matCard.nativeElement.offsetHeight;
-    this.cameraWidth = this.matCardWidth = this.matCard.nativeElement.offsetWidth;
+    if(this.matCardHeight != this.matCard.nativeElement.offsetHeight || this.matCardWidth != this.matCard.nativeElement.offsetWidth) {
+      this.cameraHeight = this.matCardHeight = this.matCard.nativeElement.offsetHeight;
+      this.cameraWidth = this.matCardWidth = this.matCard.nativeElement.offsetWidth;
+      return true;  
+    } else {
+      return false;
+    }
+  }
+  onScoreChange(evt: any) {
+    if(evt.isUserInput) {
+      console.log(evt)
+      this.http.get(`/score?score=${evt.source.value}&assetType=${this.assetType}`)
+      .subscribe((data) => {
+        console.log('json', data)
+      });
+    }
+  }
+  onModelChange(evt: any) {
+    if(evt.isUserInput) {
+      console.log(evt)
+      this.http.get(`/model?model=${evt.source.value}&assetType=${this.assetType}`)
+      .subscribe((data) => {
+        console.log('json', data)
+      });
+    }
   }
   public handleInitError(error: WebcamInitError): void {
     this.errors.push(error);
@@ -173,9 +210,11 @@ export class InspectComponent implements OnInit {
                 this.loadJson(file);
               });
             } else {
-              this.prevJson = data;
-              this.cutoff = ''+this.prevJson.confidentCutoff.toFixed(2);
-              this.drawComponent();
+              if(!this.prevJson || this.prevJson.version.version != data.version.version || this.prevJson.version.name != data.version.name || this.prevJson.timestamp != data.timestamp) {
+                this.prevJson = data;
+                this.cutoff = ''+this.prevJson.confidentCutoff.toFixed(2);
+                this.drawComponent();  
+              }
             }
           }
         }  
@@ -273,12 +312,19 @@ export class InspectComponent implements OnInit {
     .subscribe((res) => {
       console.log(res)
       console.log(`${imageFile.name} uploaded successfully.`)
+      this.showMessage('Snapshot is being processed, hold tight!');
       // this.uploaded = " - Uploaded!";
       this.resetTimer();
     }, (err) => {
       console.log(err);
       this.uploaded = " - Upload failed!";
     });
-
+  }
+  showMessage(msg: string, action: string = 'OK') {
+    let config = new MatSnackBarConfig();
+    config.verticalPosition = this.verticalPosition;
+    config.horizontalPosition = this.horizontalPosition;
+    config.duration = 3000;
+    this.snackBar.open(msg, action, config);
   }
 }

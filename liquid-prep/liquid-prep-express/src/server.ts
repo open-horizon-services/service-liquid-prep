@@ -12,6 +12,7 @@ declare const process: any;
 export class Server {
   app = express();
   apiUrl = `${process.env.SERVERLESS_ENDPOINT}`
+  utils: any;
   constructor(private port = 3000) {
     this.initialise()
   }
@@ -73,6 +74,16 @@ export class Server {
       }
     });
 
+    app.get("/score", (req, res) => {
+      this.setInteractive();
+      this.utils.$score.next({name: 'score', score: req.query.score, assetType: req.query.assetType});
+      res.send({status: true, message: `Score: ${req.query.score}`});
+    });
+    app.get("/model", (req, res) => {
+      this.setInteractive();
+      this.utils.$model.next({name: 'model', model: req.query.model, assetType: req.query.assetType});
+      res.send({status: true, message: `Model: ${req.query.model}`});
+    });
     app.get("/get_weather_info", (req: express.Request, res: express.Response, next) => {
       util.httpGet(`${this.apiUrl}/get_weather_info`)
       .subscribe({
@@ -104,7 +115,7 @@ export class Server {
     });
 
     const server = http.createServer(app);
-    const utils = new Utils(server, this.port);
+    this.utils = new Utils(server, this.port);
   }
   setInteractive = () => {
     process.env.npm_config_lastinteractive = Date.now();

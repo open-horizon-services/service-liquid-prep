@@ -4,22 +4,113 @@
       "bbox": [
         {
           "detectedBox": [
-            "0.02",
-            "0.33",
-            "0.24",
-            "0.52"
+            "0.74",
+            "0.77",
+            "0.83",
+            "0.88"
           ],
-          "detectedClass": "hard-hat",
+          "detectedClass": "hardhat",
           "detectedScore": "1.00"
+        },
+        {
+          "detectedBox": [
+            "0.04",
+            "0.40",
+            "0.30",
+            "0.75"
+          ],
+          "detectedClass": "hardhat",
+          "detectedScore": "1.00"
+        },
+        {
+          "detectedBox": [
+            "0.70",
+            "0.56",
+            "0.80",
+            "0.69"
+          ],
+          "detectedClass": "hardhat",
+          "detectedScore": "0.99"
+        },
+        {
+          "detectedBox": [
+            "0.70",
+            "0.01",
+            "1.00",
+            "0.37"
+          ],
+          "detectedClass": "hardhat",
+          "detectedScore": "0.99"
+        },
+        {
+          "detectedBox": [
+            "0.00",
+            "0.19",
+            "0.98",
+            "1.00"
+          ],
+          "detectedClass": "person",
+          "detectedScore": "0.85"
+        },
+        {
+          "detectedBox": [
+            "0.74",
+            "0.70",
+            "0.99",
+            "0.92"
+          ],
+          "detectedClass": "person",
+          "detectedScore": "0.84"
+        },
+        {
+          "detectedBox": [
+            "0.05",
+            "0.36",
+            "0.49",
+            "0.88"
+          ],
+          "detectedClass": "person",
+          "detectedScore": "0.76"
+        },
+        {
+          "detectedBox": [
+            "0.93",
+            "0.46",
+            "1.00",
+            "0.67"
+          ],
+          "detectedClass": "mask",
+          "detectedScore": "0.74"
+        },
+        {
+          "detectedBox": [
+            "0.69",
+            "0.48",
+            "0.99",
+            "0.71"
+          ],
+          "detectedClass": "person",
+          "detectedScore": "0.65"
+        },
+        {
+          "detectedBox": [
+            "0.32",
+            "0.30",
+            "0.48",
+            "0.83"
+          ],
+          "detectedClass": "vest",
+          "detectedScore": "0.57"
         }
       ],
-      "elapsedTime": 2339.5068749934435
+      "elapsedTime": 2272.8544579967856
     }
   },
   "version": {
     "name": "Demo model",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
-  "confidentCutoff": 0.85,
-  "platform": "darwin:arm64"
+  "confidentCutoff": 0.5,
+  "platform": "darwin:arm64",
+  "timestamp": 1675828476097
 }
