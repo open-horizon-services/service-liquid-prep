@@ -1,4 +1,6 @@
 {
-  "name": "Demo model",
-  "version": "2.0.0"
+  "name": "Insects model v3.0.1",
+  "version": "3.0.1",
+  "input": "x",
+  "type": "float"
 }

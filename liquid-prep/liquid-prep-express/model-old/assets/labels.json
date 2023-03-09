@@ -1,9 +1,7 @@
 {
-  "1": "hardhat",
-  "2": "mask",
-  "3": "person",
-  "4": "vest",
-  "5": "head",
-  "6": "lab_coat",
-  "7": "badge"
+  "0": "dragonfly",
+  "1": "butterfly",
+  "2": "grasshopper",
+  "3": "ladybug",
+  "4": "mosquito"
 }

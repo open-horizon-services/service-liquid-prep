@@ -38,6 +38,7 @@ export class Utils {
     server: null,
     sockets: [],
   };
+  timeSeries = {};
   $score = new Subject().asObservable().subscribe((data:any) => {
     if(data.name == 'score') {
       this.confidentCutoff = parseFloat(data.score);
@@ -118,6 +119,13 @@ export class Utils {
       // sending message
       ws.on("message", data => {
         console.log(`Client has sent us: ${data}`)
+        try {
+          let input = JSON.parse(data);
+          this.timeSeries[input.name] = {moisture: input.moisture, timestamp: Date.now()}
+          console.log('Currentlog: %j' , this.timeSeries)  
+        } catch(e) {
+          console.log('JSON parse error...')          
+        }
         wss.clients.forEach((client) => {
           if(client != ws && client.readyState) {
             client.send(`broadcast: ${data}`)
@@ -244,18 +252,18 @@ export class Utils {
   inference(inputTensor) {
     return new Observable((observer) => {
       try {
-        const startTime = tfnode.util.now();
+        const startTime = Date.now();
         // input_tensor worked for worker safety
         let input = this.version.input && this.version.input.length > 0 ? this.version.input : 'input_tensor';
         let tensor = {};
         tensor[input] = inputTensor; 
-        //console.log(input, tensor)
+        console.log(input, tensor)
         let outputTensor = this.model.predict(tensor);
         const scores = outputTensor['detection_scores'].arraySync();
         const boxes = outputTensor['detection_boxes'].arraySync();
         const classes = outputTensor['detection_classes'].arraySync();
         const num = outputTensor['num_detections'].arraySync();
-        const endTime = tfnode.util.now();
+        const endTime = Date.now();
         outputTensor['detection_scores'].dispose();
         outputTensor['detection_boxes'].dispose();
         outputTensor['detection_classes'].dispose();
@@ -528,9 +536,9 @@ export class Utils {
           })  
         }
       } else if(modelPath !== this.newModelPath){
-        const startTime = tfnode.util.now();
+        const startTime = Date.now();
         this.model = await tfnode.node.loadSavedModel(modelPath);
-        const endTime = tfnode.util.now();
+        const endTime = Date.now();
 
         console.log(`loading time:  ${modelPath}, ${endTime-startTime}`);
         this.labels = jsonfile.readFileSync(`${modelPath}/assets/labels.json`);

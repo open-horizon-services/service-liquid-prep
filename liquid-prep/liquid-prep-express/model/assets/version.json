@@ -1,6 +1,4 @@
 {
-  "name": "Insects model",
-  "version": "2.1.0",
-  "input": "input_tensor",
-  "type": ""
+  "name": "Finger model",
+  "version": "1.0.0"
 }
