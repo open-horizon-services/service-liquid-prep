@@ -121,7 +121,7 @@ export class Utils {
         console.log(`Client has sent us: ${data}`)
         try {
           let input = JSON.parse(data);
-          this.timeSeries[input.name] = {moisture: input.moisture, timestamp: Date.now()}
+          this.timeSeries[input.mac] = {name: input.name, id: input.id, moisture: input.moisture, timestamp: Date.now()}
           console.log('Currentlog: %j' , this.timeSeries)  
         } catch(e) {
           console.log('JSON parse error...')          
