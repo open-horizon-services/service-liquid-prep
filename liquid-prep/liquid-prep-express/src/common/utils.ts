@@ -8,7 +8,34 @@ const jsonfile = require('jsonfile');
 const cp = require('child_process'),
 exec = cp.exec;
 
+export class EnumClass {
+  private enum: any = {};
+  constructor(private eArray: any[] = []) {
+    eArray.map((el, idx) => {
+      this.enum[el] = idx;
+    });
+  }
 
+  getEnum(key: string) {
+    return this.enum[key];
+  }
+}
+
+export enum Task {
+  NO_TASK = 0,
+  UPDATE_RECEIVER_ADDR = 1,
+  UPDATE_WIFI_CHANNEL = 2,
+  UPDATE_DEVICE_NAME = 3,
+  UPDATE_DEVICE_ID = 4,
+  UPDATE_ESP_INTERVAL = 5,
+  UPDATE_SENDER_ADDR = 6,
+  REGISTER_DEVICE = 7,
+  RELATE_MESSAGE = 8,
+  RELATE_MESSAGE_UPSTREAM = 9,
+  CONNECT_WITH_ME = 10,
+  MESSAGE_ONLY = 11,
+  PING = 12
+};
 export class Utils {
   homePath = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
   mmsPath = '/mms-shared';
@@ -121,8 +148,13 @@ export class Utils {
         console.log(`Client has sent us: ${data}`)
         try {
           let input = JSON.parse(data);
-          this.timeSeries[input.mac] = {name: input.name, id: input.id, moisture: input.moisture, timestamp: Date.now()}
-          console.log('Currentlog: %j' , this.timeSeries)  
+          // TODO: hardcoding for now, add enum to reflect values coming from ESP32
+          if(input.type == Task.PING) {
+            console.log(`Ping: received from ${input.name}`)
+          } else {
+            this.timeSeries[input.mac] = {name: input.name, id: input.id, moisture: input.moisture, timestamp: Date.now()}
+            console.log('Currentlog: %j' , this.timeSeries)
+          }  
         } catch(e) {
           console.log('JSON parse error...')          
         }
