@@ -34,7 +34,10 @@ export enum Task {
   RELATE_MESSAGE_UPSTREAM = 9,
   CONNECT_WITH_ME = 10,
   MESSAGE_ONLY = 11,
-  PING = 12
+  PING = 12,
+  QUERY = 13,
+  QUERY_RESULT = 14,
+  CONNECT_WITH_YOU = 15
 };
 export class Utils {
   homePath = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
@@ -148,9 +151,21 @@ export class Utils {
         console.log(`Client has sent us: ${data}`)
         try {
           let input = JSON.parse(data);
-          // TODO: hardcoding for now, add enum to reflect values coming from ESP32
           if(input.type == Task.PING) {
             console.log(`Ping: received from ${input.name}`)
+          } else if(input.type == Task.QUERY_RESULT) {
+            let msg = input.msg.split(',');
+            let res = {
+              name: input.name,
+              id: input.id,
+              interval: input.interval,
+              airValue: msg[0],
+              waterValue: msg[1],
+              pin: msg[2],
+              senderMac: msg[3],
+              receiverMac: msg[4]
+            }
+            console.log('Query result: %j' , res)
           } else {
             this.timeSeries[input.mac] = {name: input.name, id: input.id, moisture: input.moisture, timestamp: Date.now()}
             console.log('Currentlog: %j' , this.timeSeries)
