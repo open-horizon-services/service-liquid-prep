@@ -1003,7 +1003,7 @@
           "detectedScore": "1.00"
         }
       ],
-      "elapsedTime": 1533
+      "elapsedTime": 1430
     }
   },
   "version": {
@@ -1012,5 +1012,5 @@
   },
   "confidentCutoff": 0.5,
   "platform": "darwin:arm64",
-  "timestamp": 1678751804005
+  "timestamp": 1678819941237
 }
