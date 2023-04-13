@@ -7,6 +7,16 @@ Service Liquid Prep is an Open Horizon integration project for the [Liquid Prep 
 The Liquid Prep App, developed with the [Angular](https://angular.io/) web framework, retrieves weather and crop data from the [Liquid Prep Backend](https://github.com/Liquid-Prep/LiquidPrep-Backend) service and soil moisture data from the [Liquid Prep Hardware](https://github.com/Liquid-Prep/LiquidPrep-Hardware). After analyzing the weather, crop, and soil moisture data, the app computes and provides water advice for the selected crop.
 
 The goal of Service Liquid Prep is to integrate the Liquid Prep App with Open Horizon by creating an Express server backend and using Dockerfiles for the supported platforms. This enables containerization of the Liquid Prep App as a service for edge computing, offering benefits such as improved resilience, security, sensors management, flexibility, and local storage.
+
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Advanced Details](#advanced-details)
+- [Contributing](#contributing)
+- [Authors](#authors)
+- [License](#license)
 ## Prerequisites
 
 [//]: # (List the prerequisites for using the project, such as required software, hardware, or skills)
