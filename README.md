@@ -21,17 +21,24 @@ The goal of Service Liquid Prep is to integrate the Liquid Prep App with Open Ho
 
 [//]: # (List the prerequisites for using the project, such as required software, hardware, or skills)
 
+TBD
 ## Installation
 
 [//]: # (Provide step-by-step instructions for installing the project)
+
+TBD
 
 ## Usage
 
 [//]: # (Explain how to use the project, including any available configuration options and examples)
 
+TBD
+
 ## Advanced Details
 
 [//]: # (Include any advanced usage details or technical information about the project)
+
+TBD
 
 ## Authors
 
@@ -40,7 +47,7 @@ Service Liquid Prep is maintained by:
 - Troy Fine ([t-fine](https://github.com/t-fine)) - troy.fine@ibm.com
 - Jeff Lu ([playground](https://github.com/playground)) - ljeff@us.ibm.com
 
-For the full list of contributors, see the [MAINTAINERS.md](MAINTAINERS.md) file.
+For the full list of maintainers, see the [MAINTAINERS.md](MAINTAINERS.md) file.
 
 ## License
 
