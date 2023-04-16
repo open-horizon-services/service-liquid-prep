@@ -1,5 +1,7 @@
 # Service Liquid Prep
 
+[![License: Apache 2](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Service Liquid Prep is an Open Horizon integration project for the [Liquid Prep App](https://liquid-prep-app.s3-web.us-east.cloud-object-storage.appdomain.cloud/), a Progressive Web App (PWA) that provides water advice for selected crops based on weather, crop, and soil moisture data.
 
 ## Overview
@@ -17,11 +19,13 @@ The goal of Service Liquid Prep is to integrate the Liquid Prep App with Open Ho
 - [Contributing](#contributing)
 - [Authors](#authors)
 - [License](#license)
+
 ## Prerequisites
 
 [//]: # (List the prerequisites for using the project, such as required software, hardware, or skills)
 
 TBD
+
 ## Installation
 
 [//]: # (Provide step-by-step instructions for installing the project)
@@ -40,6 +44,12 @@ TBD
 
 TBD
 
+## Contributing
+
+[//]: # (Provide instructions for contributing to the project, including any special guidelines or steps)
+
+TBD
+
 ## Authors
 
 Service Liquid Prep is maintained by:
@@ -51,5 +61,4 @@ For the full list of maintainers, see the [MAINTAINERS.md](MAINTAINERS.md) file.
 
 ## License
 
-[//]: # (Include information about the project's license)
-
+Unless otherwise noted, this project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details.
