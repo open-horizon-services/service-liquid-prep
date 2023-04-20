@@ -15,8 +15,6 @@ The goal of Service Liquid Prep is to integrate the Liquid Prep App with Open Ho
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Advanced Details](#advanced-details)
-- [Contributing](#contributing)
 - [Authors](#authors)
 - [License](#license)
 
@@ -35,18 +33,6 @@ TBD
 ## Usage
 
 [//]: # (Explain how to use the project, including any available configuration options and examples)
-
-TBD
-
-## Advanced Details
-
-[//]: # (Include any advanced usage details or technical information about the project)
-
-TBD
-
-## Contributing
-
-[//]: # (Provide instructions for contributing to the project, including any special guidelines or steps)
 
 TBD
 
