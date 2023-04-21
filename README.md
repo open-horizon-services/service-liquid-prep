@@ -8,7 +8,9 @@ Service Liquid Prep is an Open Horizon integration project for the [Liquid Prep 
 
 The Liquid Prep App, developed with the [Angular](https://angular.io/) web framework, retrieves weather and crop data from the [Liquid Prep Backend](https://github.com/Liquid-Prep/LiquidPrep-Backend) service and soil moisture data from the [Liquid Prep Hardware](https://github.com/Liquid-Prep/LiquidPrep-Hardware). After analyzing the weather, crop, and soil moisture data, the app computes and provides water advice for the selected crop.
 
-The goal of Service Liquid Prep is to integrate the Liquid Prep App with Open Horizon by creating an Express server backend and using Dockerfiles for the supported platforms. This enables containerization of the Liquid Prep App as a service for edge computing, offering benefits such as improved resilience, security, sensors management, flexibility, and local storage.
+The goal of Service Liquid Prep is to integrate the Liquid Prep App with Open Horizon by creating an Express server backend and using Dockerfiles for the supported platforms. This enables containerization of the Liquid Prep App as a service for edge computing, offering benefits such as improved resilience, security, sensors management, flexibility, and local storage. 
+
+The integration with Open Horizon will also enrich the Liquid Prep App with additional features and allow it to perform certain tasks in real-time, even when it is offline. For example, visual inspections, analytics, and inferencing can be performed with machine learning on the edge device itself.
 
 ## Table of Contents
 
@@ -41,7 +43,8 @@ Once the Service Liquid Prep is installed and running on your edge device, it wi
 
 To use the Service Liquid Prep with the Liquid Prep App, update the `config.json` file of the Liquid Prep App with the appropriate Service Liquid Prep endpoint (e.g., `http://<your-edge-device-ip>:<express-server-port>`).
 
-After updating the `config.json` file, you can use the Liquid Prep App to get water advice for the selected crop based on weather, crop, and soil moisture data, leveraging the benefits of edge computing provided by the Service Liquid Prep integration with Open Horizon.
+After updating the `config.json` file, you can use the Liquid Prep App to get water advice for the selected crop based on weather, crop, and soil moisture data, leveraging the benefits of edge computing provided by the Service Liquid Prep integration with Open Horizon. This integration also enables enriched features and real-time processing, allowing the app to perform tasks such as visual inspections, analytics, and inferencing using machine learning on the edge device, even when it is offline.
+
 
 
 ## Authors
