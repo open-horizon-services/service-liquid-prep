@@ -37,9 +37,12 @@ TBD
 
 ## Usage
 
-[//]: # (Explain how to use the project, including any available configuration options and examples)
+Once the Service Liquid Prep is installed and running on your edge device, it will provide an Express server backend for the Liquid Prep App. This backend communicates with the Liquid Prep Backend service and the Liquid Prep Hardware to retrieve the necessary data.
 
-TBD
+To use the Service Liquid Prep with the Liquid Prep App, update the `config.json` file of the Liquid Prep App with the appropriate Service Liquid Prep endpoint (e.g., `http://<your-edge-device-ip>:<express-server-port>`).
+
+After updating the `config.json` file, you can use the Liquid Prep App to get water advice for the selected crop based on weather, crop, and soil moisture data, leveraging the benefits of edge computing provided by the Service Liquid Prep integration with Open Horizon.
+
 
 ## Authors
 
