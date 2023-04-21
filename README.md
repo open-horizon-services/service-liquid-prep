@@ -20,9 +20,14 @@ The goal of Service Liquid Prep is to integrate the Liquid Prep App with Open Ho
 
 ## Prerequisites
 
-[//]: # (List the prerequisites for using the project, such as required software, hardware, or skills)
+To use Service Liquid Prep, you will need:
 
-TBD
+1. Node.js and NPM:
+   - [Install Node.js and NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+2. Docker:
+   - [Install Docker](https://docs.docker.com/engine/install/)
+3. Open Horizon:
+   - [Install Open Horizon](https://github.com/open-horizon/anax#installation)
 
 ## Installation
 
