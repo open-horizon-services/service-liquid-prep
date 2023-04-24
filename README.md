@@ -33,9 +33,40 @@ To use Service Liquid Prep, you will need:
 
 ## Installation
 
-[//]: # (Provide step-by-step instructions for installing the project)
+1. Clone the Service Liquid Prep repository:
 
-TBD
+```bash
+git clone https://github.com/your-org/service-liquid-prep.git
+cd service-liquid-prep
+``` 
+
+2. Install dependencies: 
+
+```bash
+npm install
+```
+
+3. Build the Docker image for the Service Liquid Prep: 
+
+```bash
+docker build -t service-liquid-prep
+```
+
+4. Set up the Open Horizon environment: 
+
+- Follow the instructions in the [Open Horizon documentation](https://github.com/open-horizon/anax#installation) to set up and configure the Open Horizon environment on your edge device.
+
+5. Deploy the Service Liquid Prep Docker container using Open Horizon:
+
+```bash 
+hzn exchange service publish -f service-liquid-prep.service.definition.json
+hzn exchange pattern publish -f service-liquid-prep.pattern.json
+hzn register --pattern <your-org>/service-liquid-prep-pattern
+```
+
+Replace `<your-org>` with your organization's name.
+
+After completing these steps, the Service Liquid Prep will be installed and running on your edge device, integrated with Open Horizon.
 
 ## Usage
 
