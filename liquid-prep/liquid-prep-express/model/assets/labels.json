@@ -1,8 +1,9 @@
 {
-  "1": "one_finger",
-  "2": "two_fingers",
-  "3": "three_fingers",
-  "4": "four_fingers",
-  "5": "five_fingers",
-  "6": "fist"
+  "1": "hardhat",
+  "2": "mask",
+  "3": "person",
+  "4": "vest",
+  "5": "head",
+  "6": "lab_coat",
+  "7": "badge"
 }

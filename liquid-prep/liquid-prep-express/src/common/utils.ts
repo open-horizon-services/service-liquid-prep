@@ -1,5 +1,6 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync } from 'fs';
 import { forkJoin, Observable, Subject } from 'rxjs';
+import sharp = require('sharp');
 import WebSocket from 'ws';
 
 const ffmpeg = require('ffmpeg');
@@ -40,7 +41,8 @@ export enum Task {
   CONNECT_WITH_YOU = 15,
   CALIBRATE_AIR = 16,
   CALIBRATE_WATER = 17,
-  CALIBRATE_RESULT = 18
+  CALIBRATE_RESULT = 18,
+  BROADCAST = 19
 };
 export class Utils {
   homePath = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
@@ -154,7 +156,7 @@ export class Utils {
       senderMac: msg[3],
       receiverMac: msg[4]
     }
-    console.log(`${title}: %j` , res)
+    console.log(`${title}: %j\n` , res)
     return res;
   }
   initWebSocketServer() {
@@ -166,18 +168,18 @@ export class Utils {
       console.log("new client connected");
       // sending message
       ws.on("message", data => {
-        console.log(`Client has sent us: ${data}`)
+        console.log(`Client has sent us: ${data}\n`)
         try {
           let input = JSON.parse(data);
-          if(input.type == Task.PING) {
-            console.log(`Ping: received from ${input.name}`)
-          } else if(input.type == Task.QUERY_RESULT) {
+          if(input.task == Task.PING) {
+            console.log(`Ping: received from ${input.name}\n`)
+          } else if(input.task == Task.QUERY_RESULT) {
             this.getResult(input, 'Query result');
-          } else if(input.type == Task.CALIBRATE_RESULT) {
+          } else if(input.task == Task.CALIBRATE_RESULT) {
             this.getResult(input, 'Calibrate result');
           } else {
             this.timeSeries[input.mac] = {name: input.name, id: input.id, moisture: input.moisture, timestamp: Date.now()}
-            console.log('Currentlog: %j' , this.timeSeries)
+            console.log('Currentlog: %j\n' , this.timeSeries)
           }  
         } catch(e) {
           console.log('JSON parse error...')          
@@ -242,30 +244,61 @@ export class Utils {
         try {
           let cycles = 0;
           console.log(imageFile)
-          const image = readFileSync(imageFile);
-          //const decodedImage = tfnode.node.decodeImage(new Uint8Array(image), 3);
-          let decodedImage = tfnode.node.decodeImage(image, 3);
-          let inputTensor;
-          switch(this.version.type) {
-            case 'float':
-              inputTensor = decodedImage.expandDims(0).cast('float32');
-              break;
-            default:
-              inputTensor = decodedImage.expandDims(0);
-              break;
-          }
-          this.inference(inputTensor)
-          .subscribe({
-              next: (json) => {
-              let images = {};
-              images['/static/images/image-old.png'] = json;
-              json = Object.assign({images: images, version: this.version, confidentCutoff: this.confidentCutoff, platform: `${process.platform}:${process.arch}`, timestamp: Date.now()});
-              jsonfile.writeFile(`${this.staticPath}/image.json`, json, {spaces: 2});
-              this.renameFile(imageFile, `${this.imagePath}/image-old.png`);
-            }, error: (err) => {
+          sharp(imageFile)
+            .resize(512,512)
+            .toBuffer()
+            .then((data) => {
+              const image = data;
+              let decodedImage = tfnode.node.decodeImage(image, 3);
+              console.log('tensor shape', decodedImage.shape)
+              let inputTensor;
+              switch(this.version.type) {
+                case 'float':                  
+                  inputTensor = decodedImage.expandDims(0).cast('float32');
+                  break;
+                default:
+                  inputTensor = decodedImage.expandDims(0);
+                  break;
+              }
+              this.inference(inputTensor)
+              .subscribe({
+                  next: (json) => {
+                  let images = {};
+                  images['/static/images/image-old.png'] = json;
+                  json = Object.assign({images: images, version: this.version, confidentCutoff: this.confidentCutoff, platform: `${process.platform}:${process.arch}`, timestamp: Date.now()});
+                  jsonfile.writeFile(`${this.staticPath}/image.json`, json, {spaces: 2});
+                  this.renameFile(imageFile, `${this.imagePath}/image-old.png`);
+                }, error: (err) => {
+    
+                }
+              });    
+            })
+            .catch((e) => console.log(e))
 
-            }
-          });
+          //const image = readFileSync(imageFile);
+          ////const decodedImage = tfnode.node.decodeImage(new Uint8Array(image), 3);
+          //let decodedImage = tfnode.node.decodeImage(image, 3);
+          //let inputTensor;
+          //switch(this.version.type) {
+          //  case 'float':
+          //    inputTensor = decodedImage.expandDims(0).cast('float32');
+          //    break;
+          //  default:
+          //    inputTensor = decodedImage.expandDims(0);
+          //    break;
+          //}
+          //this.inference(inputTensor)
+          //.subscribe({
+          //    next: (json) => {
+          //    let images = {};
+          //    images['/static/images/image-old.png'] = json;
+          //    json = Object.assign({images: images, version: this.version, confidentCutoff: this.confidentCutoff, platform: `${process.platform}:${process.arch}`, timestamp: Date.now()});
+          //    jsonfile.writeFile(`${this.staticPath}/image.json`, json, {spaces: 2});
+          //    this.renameFile(imageFile, `${this.imagePath}/image-old.png`);
+          //  }, error: (err) => {
+
+          //  }
+          //});
         } catch(e) {
           console.log(e);
           unlinkSync(imageFile);

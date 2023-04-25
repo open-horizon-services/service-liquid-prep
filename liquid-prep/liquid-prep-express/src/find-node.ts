@@ -29,7 +29,7 @@ const find = (name) => {
         })
       }
       sleep(2000).then(() => {
-        setCheckInterval(8000);
+        setCheckInterval(30000);
       })
     }
   })
