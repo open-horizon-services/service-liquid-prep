@@ -11,23 +11,6 @@
   <div class="imgHolder" *ngIf="todayWeather">
     <div class="horizontal">
       <div class="temp">
-        <span class="vertical-align-middle">Inspect</span>
-      </div>
-      <div>
-        <button
-          class="vertical-align-middle"
-          mat-icon-button
-          color="primary"
-          (click)="inspect()"
-          title="Toggle client camera"
-          [disabled]="isCameraDisabled"
-        >
-          <mat-icon #front_camera class="float-right">camera_alt</mat-icon>
-        </button>
-      </div>
-    </div>
-    <div class="horizontal">
-      <div class="temp">
         <span class="vertical-align-middle"
           >{{ todayWeather.maxTemperature }}&deg;C</span
         >
