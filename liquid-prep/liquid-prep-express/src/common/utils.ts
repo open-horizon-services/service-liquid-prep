@@ -36,13 +36,14 @@ export enum Task {
   CONNECT_WITH_ME = 10,
   MESSAGE_ONLY = 11,
   PING = 12,
-  QUERY = 13,
-  QUERY_RESULT = 14,
-  CONNECT_WITH_YOU = 15,
-  CALIBRATE_AIR = 16,
-  CALIBRATE_WATER = 17,
-  CALIBRATE_RESULT = 18,
-  BROADCAST = 19
+  PING_BACK = 13,
+  QUERY = 14,
+  QUERY_RESULT = 15,
+  CONNECT_WITH_YOU = 16,
+  CALIBRATE_AIR = 17,
+  CALIBRATE_WATER = 18,
+  CALIBRATE_RESULT = 19,
+  BROADCAST = 20
 };
 export class Utils {
   homePath = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
@@ -144,6 +145,9 @@ export class Utils {
     this.initialInference();  
     this.setInterval(this.intervalMS);
   }
+  setTimeInterval(ms: number) {
+    this.intervalMS = ms;
+  }
   getResult(input: any, title: String) {
     let msg = input.msg.split(',');
     let res = {
@@ -171,7 +175,7 @@ export class Utils {
         console.log(`Client has sent us: ${data}\n`)
         try {
           let input = JSON.parse(data);
-          if(input.task == Task.PING) {
+          if(input.task == Task.PING_BACK) {
             console.log(`Ping: received from ${input.name}\n`)
           } else if(input.task == Task.QUERY_RESULT) {
             this.getResult(input, 'Query result');

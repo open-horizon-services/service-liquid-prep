@@ -74,6 +74,10 @@ export class Server {
       }
     });
 
+    app.get("/interval", (req, res) => {
+      this.utils.setTimeInterval(req.query.ms)
+      res.send({status: true, message: `Interval: ${req.query.ms}`});
+    });
     app.get("/score", (req, res) => {
       this.setInteractive();
       this.utils.$score.next({name: 'score', score: req.query.score, assetType: req.query.assetType});
