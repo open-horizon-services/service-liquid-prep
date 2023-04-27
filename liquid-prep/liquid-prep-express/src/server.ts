@@ -13,7 +13,7 @@ export class Server {
   app = express();
   apiUrl = `${process.env.SERVERLESS_ENDPOINT}`
   utils: any;
-  constructor(private port = 3003) {
+  constructor(private port = 3000) {
     this.initialise()
   }
 
@@ -77,6 +77,9 @@ export class Server {
     app.get("/interval", (req, res) => {
       this.utils.setTimeInterval(req.query.ms)
       res.send({status: true, message: `Interval: ${req.query.ms}`});
+    });
+    app.get("/log", (req, res) => {
+      res.send({status: true, timeSeries: this.utils.timeSeries});
     });
     app.get("/score", (req, res) => {
       this.setInteractive();

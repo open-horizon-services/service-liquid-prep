@@ -39,6 +39,7 @@ import { WelcomeComponent } from './components/welcome/welcome.component';
 import { MaterialModule } from './material/material.module';
 import { DateAgoPipe } from './pipes/date-ago.pipe';
 import { DataService } from './service/DataService';
+import { SensorsComponent } from './components/sensors/sensors.component';
 
 const DEFAULT_SWIPER_CONFIG: SwiperConfigInterface = {
   observer: true,
@@ -60,7 +61,8 @@ const DEFAULT_SWIPER_CONFIG: SwiperConfigInterface = {
     SeedDateComponent,
     DateAgoPipe,
     SlideIndicatorComponent,
-    InspectComponent],
+    InspectComponent,
+    SensorsComponent],
   imports: [
     BrowserModule,
     MaterialModule,
