@@ -8,7 +8,7 @@
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef> Name </th>
-        <td mat-cell *matCellDef="let element" [routerLink]="['/device/' + element.id]" class="hand-pointer"> {{element.name}} </td>
+        <td mat-cell *matCellDef="let element" (click)="showDialog(element.mac)" class="hand-pointer"> {{element.name}} </td>
       </ng-container>
 
       <!-- Status Column -->
@@ -23,21 +23,15 @@
         <td mat-cell *matCellDef="let element" class="date-font"> {{element.lastUpdate}} </td>
       </ng-container>
       <ng-container matColumnDef="action">
-        <th mat-header-cell *matHeaderCellDef>Action</th>
+        <th mat-header-cell *matHeaderCellDef>Status</th>
         <td mat-cell *matCellDef="let element">
-          <div class="custom-control custom-switch">
-            <mat-select name="action" required>
-              <mat-option *ngFor="let action of actions" [value]="action.value">
-                {{action.text}}
-              </mat-option>
-            </mat-select>
-          </div>
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="columns"></tr>
-      <tr mat-row *matRowDef="let row; columns: columns;"></tr> 
-        <!-- [routerLink]="['/device/' + row.id]" class="hand-pointer"></tr> -->
+      <tr mat-row *matRowDef="let row; columns: columns;"
+      (click)="showDialog(row.mac)" class="hand-pointer">
+    </tr>
     </table>
   </mat-card-content>  
 </mat-card>
