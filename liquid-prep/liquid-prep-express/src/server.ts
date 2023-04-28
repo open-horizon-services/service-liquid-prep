@@ -79,7 +79,16 @@ export class Server {
       res.send({status: true, message: `Interval: ${req.query.ms}`});
     });
     app.get("/log", (req, res) => {
-      res.send({status: true, timeSeries: this.utils.timeSeries});
+      res.send({status: 200, timeSeries: this.utils.timeSeries});
+    });
+    app.get("/query", (req, res) => {
+      let timeSeries = {};
+      Object.keys(this.utils.timeSeries).forEach((key) => {
+        if(key == req.query.host_addr) {
+          timeSeries = this.utils.timeSeries[key];
+        }
+      })
+      res.send({status: 200, timeSeries: timeSeries});
     });
     app.get("/score", (req, res) => {
       this.setInteractive();

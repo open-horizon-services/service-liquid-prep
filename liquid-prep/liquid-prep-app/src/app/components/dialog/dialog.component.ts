@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
@@ -5,6 +6,8 @@ export interface DialogData {
   title: string;
   type: string;
   name: string;
+  gateway: string;
+  espnow: string;
   placeholder: string;
   mac: string;
   object: any;
@@ -16,16 +19,20 @@ export interface DialogData {
   styleUrls: ['./dialog.component.scss']
 })
 export class DialogComponent implements OnInit {
+  //@ViewChild('display', { static: false, read: ElementRef})
   cancelLabel = 'Cancel';
   okLabel = 'Save';
   notOK = true;
   label = '';
   newValue = '';
   show = false;
+  url = '';
+  html = '';
   
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData    
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+    private http: HttpClient   
   ) { }
 
   ngOnInit(): void {
@@ -38,7 +45,9 @@ export class DialogComponent implements OnInit {
   onChange(evt: any) {
     if(evt.isUserInput) {
       console.log(evt.source.value)
-      switch(evt.source.value) {
+      let type = evt.source.value;
+      //this.data.type = type.match(/query/) ? 'display' : 'input'
+      switch(type) {
         case 'device_name':
           this.label = 'Name'
           this.newValue = this.data.title;
@@ -51,6 +60,7 @@ export class DialogComponent implements OnInit {
         case 'query':
           this.label = 'Query';
           this.show = false;
+          this.url = `${this.data.gateway}/${type}?host_addr=${this.data.mac}`;
           break;  
         case 'water_value':
             this.label = 'Water Value'
@@ -59,6 +69,7 @@ export class DialogComponent implements OnInit {
         case 'interval':
           this.label = 'Interval'
           this.show = true;
+          this.url = `${this.data.gateway}/${this.data.type}?host_addr=${this.data.mac}`;
           break;
         }
     }
@@ -67,11 +78,11 @@ export class DialogComponent implements OnInit {
     this.dialogRef.close();
   }
   run() {
-    if(this.newValue.length > 0) {
-      
-    }
-    console.log('data', this.newValue)
-
-    this.dialogRef.close(this.data);
+    this.http.get(this.url)
+    .subscribe(
+      (data) => {
+        console.log(data)
+      }
+    )
   }  
 }
