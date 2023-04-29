@@ -63,16 +63,21 @@ export class DialogComponent implements OnInit {
         case 'query':
           this.label = 'Query';
           this.show = false;
-          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}`;
+          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
+          break;  
+        case 'ping':
+          this.label = 'Ping';
+          this.show = false;
+          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
           break;  
         case 'water_value':
-            this.label = 'Water Value'
-            this.show = false;
-            break;
+          this.label = 'Water Value'
+          this.show = false;
+          break;
         case 'interval':
           this.label = 'Interval'
           this.show = true;
-          this.msg = `${this.data.espnow}/${this.data.type}?host_addr=${this.data.mac}`;
+          this.msg = `${this.data.espnow}/${this.data.type}?host_addr=${this.data.mac}&web_request=true`;
           break;
         }
     }
@@ -81,7 +86,7 @@ export class DialogComponent implements OnInit {
     this.dialogRef.close();
   }
   run() {
-    this.webSocketService.wsConnect(this.data.ws, 'LP');
-    this.webSocketService.sendMsg('LP', {task: 'FROM_WEB', msg: this.msg});
+    this.webSocketService.wsConnect(this.data.ws);
+    this.webSocketService.sendMsg('LP', {from: 'WEB_REQUEST', msg: this.msg});
   }  
 }

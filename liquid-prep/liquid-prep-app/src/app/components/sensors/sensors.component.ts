@@ -41,7 +41,8 @@ export class SensorsComponent implements OnInit {
     {value: 'air_value', text: 'Calibrate Air'},
     {value: 'water_value', text: 'Calibrate Water'},
     {value: 'interval', text: 'Interval'},
-    {value: 'query', text: 'Query'}
+    {value: 'ping', text: 'Ping Sensor'},
+    {value: 'query', text: 'Query Sensor'}
   ];
   dialogRef: any;
   verticalPosition: MatSnackBarVerticalPosition = 'bottom';

@@ -57,7 +57,7 @@ export class WebSocketService {
       }
     }
   }
-  wsConnect(ws: string, type) {
+  wsConnect(ws: string) {
     if (!this.$socket || this.$socket.closed) {
       WS_ENDPOINT = ws;
       this.$socket = webSocket(ws);

@@ -44,7 +44,8 @@ export enum Task {
   CALIBRATE_WATER = 18,
   CALIBRATE_RESULT = 19,
   BROADCAST = 20,
-  WEB_REQUEST = 21
+  WEB_REQUEST = 21,
+  WEB_REQUEST_RESULT = 22
 };
 export class Utils {
   homePath = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
@@ -176,16 +177,13 @@ export class Utils {
         console.log(`Client has sent us: ${data}\n`)
         try {
           let input = JSON.parse(data);
-          if(input.from == 'FROM_WEB') {
-            let arg = `curl ${input.url}`;
+          console.log(input.from)
+          if(input.from == 'WEB_REQUEST') {
+            console.log('web request', Task.WEB_REQUEST)
+            let arg = `curl ${input.msg}`;
             this.shell(arg)
             .subscribe({
               next: (res) => {
-                wss.clients.forEach((client) => {
-                  if(client != ws && client.readyState) {
-                    client.send(input)
-                  }
-                })
               }, error: (err) => {
               }
             })    
@@ -205,13 +203,15 @@ export class Utils {
               jsonStr = JSON.stringify({})
               console.log('Currentlog: %j\n' , this.timeSeries)
             }    
-            //ws.send('this message')
-            wss.clients.forEach((client) => {
-              if(client != ws && client.readyState) {
-                console.log(jsonStr)
-                client.send(jsonStr)
-              }
-            })
+            if(input.from == Task.WEB_REQUEST_RESULT) {
+              console.log('web request', input.from)
+              wss.clients.forEach((client) => {
+                if(client != ws && client.readyState) {
+                  console.log(jsonStr)
+                  client.send(jsonStr)
+                }
+              })  
+            }
           }
         } catch(e) {
           console.log('JSON parse error...', data)          
