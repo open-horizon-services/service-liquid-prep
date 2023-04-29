@@ -2,12 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
+import { WebSocketService } from '../../service/web-socket.service';
+
 export interface DialogData {
   title: string;
   type: string;
   name: string;
-  gateway: string;
   espnow: string;
+  ws: string;
   placeholder: string;
   mac: string;
   object: any;
@@ -26,12 +28,13 @@ export class DialogComponent implements OnInit {
   label = '';
   newValue = '';
   show = false;
-  url = '';
+  msg = '';
   html = '';
   
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
+    private webSocketService: WebSocketService,
     private http: HttpClient   
   ) { }
 
@@ -60,7 +63,7 @@ export class DialogComponent implements OnInit {
         case 'query':
           this.label = 'Query';
           this.show = false;
-          this.url = `${this.data.gateway}/${type}?host_addr=${this.data.mac}`;
+          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}`;
           break;  
         case 'water_value':
             this.label = 'Water Value'
@@ -69,7 +72,7 @@ export class DialogComponent implements OnInit {
         case 'interval':
           this.label = 'Interval'
           this.show = true;
-          this.url = `${this.data.gateway}/${this.data.type}?host_addr=${this.data.mac}`;
+          this.msg = `${this.data.espnow}/${this.data.type}?host_addr=${this.data.mac}`;
           break;
         }
     }
@@ -78,11 +81,7 @@ export class DialogComponent implements OnInit {
     this.dialogRef.close();
   }
   run() {
-    this.http.get(this.url)
-    .subscribe(
-      (data) => {
-        console.log(data)
-      }
-    )
+    this.webSocketService.wsConnect(this.data.ws, 'LP');
+    this.webSocketService.sendMsg('LP', {task: 'FROM_WEB', msg: this.msg});
   }  
 }

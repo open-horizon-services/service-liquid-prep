@@ -43,7 +43,8 @@ export enum Task {
   CALIBRATE_AIR = 17,
   CALIBRATE_WATER = 18,
   CALIBRATE_RESULT = 19,
-  BROADCAST = 20
+  BROADCAST = 20,
+  WEB_REQUEST = 21
 };
 export class Utils {
   homePath = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
@@ -169,30 +170,52 @@ export class Utils {
     
     // Creating connection using websocket
     wss.on("connection", ws => {
-      console.log("new client connected");
+      console.log("new client connected", ws._socket.remoteAddress);
       // sending message
       ws.on("message", data => {
         console.log(`Client has sent us: ${data}\n`)
         try {
           let input = JSON.parse(data);
-          if(input.task == Task.PING_BACK) {
-            console.log(`Ping: received from ${input.name}\n`)
-          } else if(input.task == Task.QUERY_RESULT) {
-            this.getResult(input, 'Query result');
-          } else if(input.task == Task.CALIBRATE_RESULT) {
-            this.getResult(input, 'Calibrate result');
+          if(input.from == 'FROM_WEB') {
+            let arg = `curl ${input.url}`;
+            this.shell(arg)
+            .subscribe({
+              next: (res) => {
+                wss.clients.forEach((client) => {
+                  if(client != ws && client.readyState) {
+                    client.send(input)
+                  }
+                })
+              }, error: (err) => {
+              }
+            })    
           } else {
-            this.timeSeries[input.mac] = {name: input.name, id: input.id, moisture: input.moisture, timestamp: Date.now()}
-            console.log('Currentlog: %j\n' , this.timeSeries)
-          }  
-        } catch(e) {
-          console.log('JSON parse error...')          
-        }
-        wss.clients.forEach((client) => {
-          if(client != ws && client.readyState) {
-            client.send(`broadcast: ${data}`)
+            let jsonStr = ''; 
+            if(input.task == Task.PING_BACK) {
+              jsonStr = `"{\\"result\\": \\"Ping: received from ${input.name}\\"}"`
+              console.log(`${jsonStr}\n`)
+            } else if(input.task == Task.QUERY_RESULT) {
+              jsonStr = JSON.stringify(this.getResult(input, 'Query result'))
+              //this.getResult(input, 'Query result');
+            } else if(input.task == Task.CALIBRATE_RESULT) {
+              jsonStr = JSON.stringify(this.getResult(input, 'Calibrate result'))
+              //this.getResult(input, 'Calibrate result');
+            } else {
+              this.timeSeries[input.mac] = {name: input.name, id: input.id, moisture: input.moisture, timestamp: Date.now()}
+              jsonStr = JSON.stringify({})
+              console.log('Currentlog: %j\n' , this.timeSeries)
+            }    
+            //ws.send('this message')
+            wss.clients.forEach((client) => {
+              if(client != ws && client.readyState) {
+                console.log(jsonStr)
+                client.send(jsonStr)
+              }
+            })
           }
-        })
+        } catch(e) {
+          console.log('JSON parse error...', data)          
+        }
       });
       // handling what to do when clients disconnects from server
       ws.on("close", () => {

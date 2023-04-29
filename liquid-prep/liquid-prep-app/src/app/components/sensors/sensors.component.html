@@ -29,9 +29,9 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="columns"></tr>
-      <tr mat-row *matRowDef="let row; columns: columns;"
-      (click)="showDialog(row.mac)" class="hand-pointer">
-    </tr>
+      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+      <!--(click)="showDialog(row.mac)" class="hand-pointer"
+      </tr>-->
     </table>
   </mat-card-content>  
 </mat-card>

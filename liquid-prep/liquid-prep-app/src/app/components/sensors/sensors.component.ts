@@ -48,6 +48,7 @@ export class SensorsComponent implements OnInit {
   horizontalPosition: MatSnackBarHorizontalPosition = 'center';
   espNowGateway = 'http://192.168.86.48';
   edgeGateway = 'http://192.168.86.27:3003';
+  ws = 'ws://192.168.86.27:3003';
   
   constructor(
     private dialog: MatDialog,
@@ -115,7 +116,7 @@ export class SensorsComponent implements OnInit {
   showDialog(row: string) {
     let sensor = this.device.timeSeries[row]
     console.log(row, sensor)
-    this.openDialog({title: sensor.name, gateway: this.edgeGateway, espnow: this.espNowGateway, type: 'input', placeholder: 'Sensor', buttons: {ok: 'Run'}, object: this.actions, mac: sensor.mac}, (resp: any) => {
+    this.openDialog({title: sensor.name, ws: this.ws, espnow: this.espNowGateway, type: 'input', placeholder: 'Sensor', buttons: {ok: 'Run'}, object: this.actions, mac: sensor.mac}, (resp: any) => {
       if (resp) {
         console.log(resp);
         this.showMessage('Condition has been saved.')
