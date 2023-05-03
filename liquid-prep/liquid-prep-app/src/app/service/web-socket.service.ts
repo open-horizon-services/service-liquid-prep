@@ -1,4 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
+import {
+  MatSnackBar,
+  MatSnackBarConfig,
+  MatSnackBarHorizontalPosition,
+  MatSnackBarVerticalPosition,
+} from '@angular/material/snack-bar';
+import { LOCAL_STORAGE, SESSION_STORAGE, StorageService } from 'ngx-webstorage-service';
 import { Observable, Subject, timer } from 'rxjs';
 import { delayWhen, retryWhen, tap } from 'rxjs/operators';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
@@ -13,7 +20,11 @@ export class WebSocketService {
   private $socket: WebSocketSubject<any>;
   private $msgSubject = new Subject();
   $message: any;
-  constructor() { }
+  constructor(
+    private snackBar: MatSnackBar,
+    @Inject(LOCAL_STORAGE) private localStorage: StorageService,
+    @Inject(SESSION_STORAGE) private sessionStorage: StorageService,
+  ) { }
 
   private reconnect(observable: Observable<any>): Observable<any> {
     return observable.pipe(retryWhen(errors => errors.pipe(tap(val => console.log('[Data Service] Try to reconnect', val)), 
@@ -31,6 +42,19 @@ export class WebSocketService {
         }
       },
     });
+  }
+  saveServers(servers: any) {
+    this.localStorage.set('server-info', servers);
+  }
+  getServers() {
+    return this.localStorage.get('server-info');
+  }
+  showMessage(msg: string, action: string = 'OK', horizontal: MatSnackBarHorizontalPosition = 'center', vertical: MatSnackBarVerticalPosition = 'bottom') {
+    let config = new MatSnackBarConfig();
+    config.verticalPosition = vertical;
+    config.horizontalPosition = horizontal;
+    config.duration = 5000;
+    this.snackBar.open(msg, action, config);
   }  
   connect2(cfg: { reconnect: boolean } = { reconnect: false }): void { 
     if (!this.$socket || this.$socket.closed) {
@@ -63,6 +87,11 @@ export class WebSocketService {
       this.$socket = webSocket(ws);
       this.$socket.subscribe((message) => {
         console.log(message)
+        let msg = '';
+        Object.keys(message).forEach((key) => {
+          msg += `${key}: ${message[key]} | `
+        })
+        this.showMessage(msg)
       })
       //this.$message = this.$socket.multiplex(
       //  () => ({subscribe: type}),

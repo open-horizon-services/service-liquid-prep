@@ -30,6 +30,7 @@ export class DialogComponent implements OnInit {
   show = false;
   msg = '';
   html = '';
+  selected = '';
   
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
@@ -45,6 +46,40 @@ export class DialogComponent implements OnInit {
       this.cancelLabel = this.data.buttons.cancel ? this.data.buttons.cancel : this.cancelLabel
     }
   }
+  onSelectChange(evt: any) {
+    if(evt.isUserInput) {
+      console.log(evt.source.value)
+      this.selected = evt.source.value;
+      switch(this.selected) {
+        case 'device_name':
+          this.label = 'Name'
+          this.newValue = this.data.title;
+          this.show = true;
+          break;
+        case 'air_value':
+          this.label = 'Air Value'
+          this.show = false;
+          break;
+        case 'query':
+          this.label = 'Query';
+          this.show = false;
+          break;  
+        case 'ping':
+          this.label = 'Ping';
+          this.show = false;
+          break;  
+        case 'water_value':
+          this.label = 'Water Value'
+          this.show = false;
+          break;
+        case 'esp_interval':
+          this.label = 'Interval'
+          this.newValue = "";
+          this.show = true;
+          break;
+        }
+    }
+  }
   onChange(evt: any) {
     if(evt.isUserInput) {
       console.log(evt.source.value)
@@ -55,10 +90,12 @@ export class DialogComponent implements OnInit {
           this.label = 'Name'
           this.newValue = this.data.title;
           this.show = true;
+          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&device_name=${this.newValue}&web_request=true`;
           break;
         case 'air_value':
           this.label = 'Air Value'
           this.show = false;
+          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
           break;
         case 'query':
           this.label = 'Query';
@@ -74,10 +111,11 @@ export class DialogComponent implements OnInit {
           this.label = 'Water Value'
           this.show = false;
           break;
-        case 'interval':
+        case 'esp_interval':
           this.label = 'Interval'
+          this.newValue = "";
           this.show = true;
-          this.msg = `${this.data.espnow}/${this.data.type}?host_addr=${this.data.mac}&web_request=true`;
+          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&interval=${this.newValue}&web_request=true`;
           break;
         }
     }
@@ -86,6 +124,21 @@ export class DialogComponent implements OnInit {
     this.dialogRef.close();
   }
   run() {
+    let type = this.selected;
+    switch(type) {
+      case 'air_value':
+      case 'water_value':
+          this.msg = `${this.data.espnow}/calibrate?value=${type}&host_addr=${this.data.mac}`;
+        break;
+      case 'query':
+      case 'ping':
+          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
+        break;  
+      case 'device_name':
+      case 'esp_interval':
+        this.msg = `${this.data.espnow}/update?host_addr=${this.data.mac}&${type}=${this.newValue}`;
+        break;
+    }
     this.webSocketService.wsConnect(this.data.ws);
     this.webSocketService.sendMsg('LP', {from: 'WEB_REQUEST', msg: this.msg});
   }  

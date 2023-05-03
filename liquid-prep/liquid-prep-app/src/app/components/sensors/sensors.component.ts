@@ -8,6 +8,7 @@ import {
   MatSnackBarVerticalPosition,
 } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
+import { WebSocketService } from 'src/app/service/web-socket.service';
 
 import { DialogComponent } from '../dialog/dialog.component';
 
@@ -25,6 +26,11 @@ export class TimeSeries {
   lastUpdate?: any;
   moisture?: number;
 }
+export interface IServer {
+  edgeGateway: string;
+  espNowGateway: string;
+  ws: string;
+}
 
 @Component({
   selector: 'app-sensors',
@@ -40,24 +46,33 @@ export class SensorsComponent implements OnInit {
     {value: 'device_name', text: 'Device Name'},
     {value: 'air_value', text: 'Calibrate Air'},
     {value: 'water_value', text: 'Calibrate Water'},
-    {value: 'interval', text: 'Interval'},
+    {value: 'esp_interval', text: 'Interval'},
     {value: 'ping', text: 'Ping Sensor'},
     {value: 'query', text: 'Query Sensor'}
   ];
   dialogRef: any;
   verticalPosition: MatSnackBarVerticalPosition = 'bottom';
   horizontalPosition: MatSnackBarHorizontalPosition = 'center';
-  espNowGateway = 'http://192.168.86.48';
-  edgeGateway = 'http://192.168.86.27:3003';
-  ws = 'ws://192.168.86.27:3003';
+  espNowGateway = 'http://192.168.1.48';
+  edgeGateway = 'http://192.168.1.138:3003';
+  ws = 'ws://192.168.1.138:3003';
+  servers: IServer;
+  showServers = false;
   
   constructor(
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
+    private webSocketService: WebSocketService,
     private http: HttpClient
   ) { }
 
   ngOnInit(): void {
+    this.servers = this.webSocketService.getServers();
+    if(this.servers) {
+      this.edgeGateway = this.servers.edgeGateway;
+      this.espNowGateway = this.servers.espNowGateway;
+      this.ws = this.servers.ws;
+    }
     this.fetchTimeSeries();
   }
   fetchTimeSeries() {
@@ -69,6 +84,13 @@ export class SensorsComponent implements OnInit {
           this.listDevice(data.timeSeries)
         }
       )
+  }
+  toggleServers() {
+    this.showServers = !this.showServers;
+  }
+  saveServers() {
+    console.log('save')
+    this.webSocketService.saveServers({edgeGateway: this.edgeGateway, espNowGateway: this.espNowGateway, ws: this.ws});
   }
   refresh() {
     console.log('refresh')

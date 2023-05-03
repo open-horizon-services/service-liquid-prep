@@ -6,7 +6,7 @@
         <mat-form-field appearance="fill">
           <mat-label>Actions</mat-label>
           <mat-select name="action" required>
-            <mat-option *ngFor="let action of data.object" [value]="action.value" (onSelectionChange)="onChange($event)">
+            <mat-option *ngFor="let action of data.object" [value]="action.value" (onSelectionChange)="onSelectChange($event)">
               {{action.text}}
             </mat-option>
           </mat-select>

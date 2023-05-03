@@ -1,4 +1,5 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync } from 'fs';
+import * as http from 'http';
 import { forkJoin, Observable, Subject } from 'rxjs';
 import sharp = require('sharp');
 import WebSocket from 'ws';
@@ -159,8 +160,9 @@ export class Utils {
       airValue: msg[0],
       waterValue: msg[1],
       pin: msg[2],
-      senderMac: msg[3],
-      receiverMac: msg[4]
+      channel: msg[3],
+      senderMac: msg[4],
+      receiverMac: msg[5]
     }
     console.log(`${title}: %j\n` , res)
     return res;
@@ -180,17 +182,19 @@ export class Utils {
           console.log(input.from)
           if(input.from == 'WEB_REQUEST') {
             console.log('web request', Task.WEB_REQUEST)
-            let arg = `curl ${input.msg}`;
-            this.shell(arg)
-            .subscribe({
-              next: (res) => {
-              }, error: (err) => {
-              }
-            })    
+            let data = '';
+            http.get(input.msg, (resp) => {
+              resp.on('data', (chunk) => {
+                data += chunk;
+              });
+              resp.on('end', () => {
+                console.log(data)
+              });       
+            })
           } else {
             let jsonStr = ''; 
             if(input.task == Task.PING_BACK) {
-              jsonStr = `"{\\"result\\": \\"Ping: received from ${input.name}\\"}"`
+              jsonStr = JSON.stringify({ping: `Received from ${input.name}`});
               console.log(`${jsonStr}\n`)
             } else if(input.task == Task.QUERY_RESULT) {
               jsonStr = JSON.stringify(this.getResult(input, 'Query result'))
