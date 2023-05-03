@@ -13,7 +13,8 @@
     "serve-prod": "npm run build-prod && cd dist/liquid-prep-app && http-server -c-1",
     "deploy-github": "ng build --configuration production=true --outputPath=docs --baseHref=/Liquid-Prep/",
     "postinstall": "ngcc",
-    "http-server": "http-server -o"
+    "http-server": "http-server -o",
+    "deploy:ghpages": "ng deploy --base-href=https://open-horizon-services.github.io/service-liquid-prep/"
   },
   "private": true,
   "dependencies": {
