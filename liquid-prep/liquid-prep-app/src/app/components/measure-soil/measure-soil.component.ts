@@ -1,13 +1,13 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
-import { SwiperOptions } from 'swiper';
-import { SwiperComponent} from 'ngx-swiper-wrapper';
-import {SoilMoistureService} from '../../service/SoilMoistureService';
-import {SoilMoisture} from '../../models/SoilMoisture';
-import {LineBreakTransformer} from './LineBreakTransformer';
 import { HttpClient } from '@angular/common/http';
-import { throwToolbarMixedModesError } from '@angular/material/toolbar';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { SwiperComponent } from 'ngx-swiper-wrapper';
+import { SwiperOptions } from 'swiper';
+
+import { SoilMoisture } from '../../models/SoilMoisture';
+import { SoilMoistureService } from '../../service/SoilMoistureService';
+import { LineBreakTransformer } from './LineBreakTransformer';
 
 @Component({
   selector: 'app-measure-soil',

@@ -79,9 +79,12 @@ export class SensorsComponent implements OnInit {
     this.http.get<Device>(`${this.edgeGateway}/log`)
       .subscribe(
         (data) => {
-          this.device = data
+          this.device = data;
+          let oldData = this.webSocketService.getSensorData() || {};
+          let timeSeries = Object.assign(oldData, data.timeSeries);
+          this.webSocketService.saveSensorData(timeSeries);
           console.log(this.device)
-          this.listDevice(data.timeSeries)
+          this.listDevice(timeSeries)
         }
       )
   }
