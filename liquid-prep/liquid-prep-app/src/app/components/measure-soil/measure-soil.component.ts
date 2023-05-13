@@ -83,10 +83,20 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
         if(!isNaN(parseInt(channel))) {
           data = {type: 'CHANNEL', value: channel};
           console.log(data)
-          this.updateChannel(data);
+          this.heyBluetooth(data);
           //this.connectBluetooth().then( sensorValue => {
           //  this.updateChannel(channel);
           //});
+        } else {
+          console.log('invalid channel')
+        }
+      });
+    } else if (connectionOption === 'calibrate') {
+      this.calibrate().then( mode => {
+        if(mode.toLowerCase() == 'air' || mode.toLowerCase() == 'water') {
+          data = {type: 'CALIBRATE', value: mode};
+          console.log(data)
+          this.heyBluetooth(data);
         } else {
           console.log('invalid channel')
         }
@@ -96,7 +106,7 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async updateChannel(data: any) {
+  async heyBluetooth(data: any) {
     const serviceUUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
     const characteristicUUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
 
@@ -146,6 +156,10 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
       this.setMeasureView('measuring');
       this.readingCountdown();
     }
+  }
+  async calibrate() {
+    const mode = prompt("Please enter <Water> or <Air> for calibration", );
+    return mode;
   }
   async updateWifi() {
     const channel = prompt("Please enter WiFi Channel", );

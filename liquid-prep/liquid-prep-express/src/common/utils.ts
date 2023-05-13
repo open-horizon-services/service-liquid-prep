@@ -29,8 +29,8 @@ export enum Task {
   UPDATE_DEVICE_NAME = 3,
   UPDATE_DEVICE_ID = 4,
   UPDATE_ESP_INTERVAL = 5,
-  UPDATE_SENDER_ADDR = 6,
-  REGISTER_DEVICE = 7,
+  GET_MOISTURE = 6,
+  MOISTURE_RESULT = 7,
   RELATE_MESSAGE = 8,
   RELATE_MESSAGE_UPSTREAM = 9,
   CONNECT_WITH_ME = 10,
@@ -161,7 +161,8 @@ export class Utils {
       pin: msg[2],
       channel: msg[3],
       senderMac: msg[4],
-      receiverMac: msg[5]
+      receiverMac: msg[5],
+      moisture: msg[6]
     }
     console.log(`${title}: %j\n` , res)
     return res;
@@ -201,6 +202,12 @@ export class Utils {
             } else if(input.task == Task.CALIBRATE_RESULT) {
               jsonStr = JSON.stringify(this.getResult(input, 'Calibrate result'))
               //this.getResult(input, 'Calibrate result');
+            } else if(input.task == Task.MOISTURE_RESULT) {
+              let json = this.getResult(input, 'Moisture result');
+              if(input.mac && input.mac.length == 12) {
+                this.timeSeries[input.mac] = {name: input.name, id: input.id, moisture: json.moisture, timestamp: Date.now()}
+              }
+              jsonStr = JSON.stringify(json)
             } else {
               if(input.mac && input.mac.length == 12) {
                 this.timeSeries[input.mac] = {name: input.name, id: input.id, moisture: input.moisture, timestamp: Date.now()}
