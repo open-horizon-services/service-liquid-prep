@@ -1,0 +1,48 @@
+.horizontal {
+  display: flex;
+  flex-direction: row;
+  padding-top: 10px;
+  padding-left: 8px;
+  padding-right: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.float-right {
+  float: right;
+}
+
+.mat-icon-button {
+  width: 33px;
+}
+
+.hzn-card {
+  max-width: 100%;
+}
+
+.hzn-card-content {
+  width: 100%;
+  margin-top: 3px;
+  margin-left: -29px;
+}
+.wrapper {
+  display: flex;
+  overflow: hidden;
+}
+:host ::ng-deep webcam .webcam-wrapper, .webcam-wrapper .camera-switch {
+  right: 2px;
+}
+:host ::ng-deep table.mat-table {
+  width: 100%;
+}
+:host ::ng-deep .mat-icon {
+  width: 30px;
+}
+.hzn-mat-select {
+  height: 0.8vh !important;
+}
+.hzn-form-field-select{
+  width: 80px;
+  height: 20px;
+  font-size: 10px;
+}
