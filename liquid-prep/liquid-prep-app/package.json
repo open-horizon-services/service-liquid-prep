@@ -13,7 +13,8 @@
     "serve-prod": "npm run build-prod && cd dist/liquid-prep-app && http-server -c-1",
     "deploy-github": "ng build --configuration production=true --outputPath=docs --baseHref=/Liquid-Prep/",
     "postinstall": "ngcc",
-    "http-server": "http-server -o"
+    "http-server": "http-server -o",
+    "deploy:ghpages": "ng deploy --base-href=https://open-horizon-services.github.io/service-liquid-prep/"
   },
   "private": true,
   "dependencies": {
@@ -46,6 +47,8 @@
     "@angular/language-service": "^14.1.2",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "^2.0.3",
+    "@types/node": "^14.11.1",
+    "angular-cli-ghpages": "^1.0.5",
     "codelyzer": "^6.0.2",
     "jasmine-core": "^4.3.0",
     "jasmine-spec-reporter": "^7.0.0",
