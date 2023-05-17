@@ -1,6 +1,6 @@
 {
   "name": "liquid-prep-express",
-  "version": "1.0.0",
+  "version": "1.0.8",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,9 @@
     "checkport": "lsof -i :3003",
     "watch:deploy": "nodemon -e ts,js --watch 'src/**/*.ts' --watch 'public/js/*.js' --exec 'npm run build && npm run start'",
     "debug": "DEBUG=liquid-prep npm run watch:deploy",
+    "build:image:arm64": "docker build -t playbox21/liquid-prep-express_arm64:$npm_package_version --no-cache -f Dockerfile-arm64 .",
+    "build:image:arm": "docker build --platform linux/arm -t playbox21/liquid-prep-express_arm:$npm_package_version --no-cache -f Dockerfile-arm .",
+    "build:image:amd64": "docker build --platform linux/amd64 -t playbox21/liquid-prep-express_amd64:$npm_package_version --no-cache -f Dockerfile-amd64 .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -27,7 +30,7 @@
   },
   "homepage": "https://github.com/Liquid-Prep/LiquidPrep-App#readme",
   "dependencies": {
-    "@tensorflow/tfjs-node": "^4.1.0",
+    "@tensorflow/tfjs-node": "^4.5.0",
     "cors": "^2.8.5",
     "express": "^4.17.2",
     "express-fileupload": "^1.2.1",

@@ -42,13 +42,15 @@ export class SensorsComponent implements OnInit {
   columns: string[] = ['name', 'moisture', 'lastUpdate', 'action'];
   dataSource = new MatTableDataSource<TimeSeries>([]);
   device: Device;
+  timeSeries = {};
   actions = [
     {value: 'device_name', text: 'Device Name'},
     {value: 'air_value', text: 'Calibrate Air'},
     {value: 'water_value', text: 'Calibrate Water'},
     {value: 'esp_interval', text: 'Interval'},
     {value: 'ping', text: 'Ping Sensor'},
-    {value: 'query', text: 'Query Sensor'}
+    {value: 'query', text: 'Query Sensor'},
+    {value: 'moisture', text: 'Get Moisture Reading'}
   ];
   dialogRef: any;
   verticalPosition: MatSnackBarVerticalPosition = 'bottom';
@@ -79,9 +81,12 @@ export class SensorsComponent implements OnInit {
     this.http.get<Device>(`${this.edgeGateway}/log`)
       .subscribe(
         (data) => {
-          this.device = data
+          this.device = data;
+          let oldData = this.webSocketService.getSensorData() || {};
+          this.timeSeries = Object.assign(oldData, data.timeSeries);
+          this.webSocketService.saveSensorData(this.timeSeries);
           console.log(this.device)
-          this.listDevice(data.timeSeries)
+          this.listDevice(this.timeSeries)
         }
       )
   }
@@ -137,7 +142,7 @@ export class SensorsComponent implements OnInit {
     this.snackBar.open(msg, action, config);
   }
   showDialog(row: string) {
-    let sensor = this.device.timeSeries[row]
+    let sensor = this.timeSeries[row]
     console.log(row, sensor)
     this.openDialog({title: sensor.name, ws: this.ws, espnow: this.espNowGateway, type: 'input', placeholder: 'Sensor', buttons: {ok: 'Run'}, object: this.actions, mac: sensor.mac}, (resp: any) => {
       if (resp) {

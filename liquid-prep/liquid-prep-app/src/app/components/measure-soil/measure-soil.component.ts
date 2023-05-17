@@ -1,13 +1,13 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
-import { SwiperOptions } from 'swiper';
-import { SwiperComponent} from 'ngx-swiper-wrapper';
-import {SoilMoistureService} from '../../service/SoilMoistureService';
-import {SoilMoisture} from '../../models/SoilMoisture';
-import {LineBreakTransformer} from './LineBreakTransformer';
 import { HttpClient } from '@angular/common/http';
-import { throwToolbarMixedModesError } from '@angular/material/toolbar';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { SwiperComponent } from 'ngx-swiper-wrapper';
+import { SwiperOptions } from 'swiper';
+
+import { SoilMoisture } from '../../models/SoilMoisture';
+import { SoilMoistureService } from '../../service/SoilMoistureService';
+import { LineBreakTransformer } from './LineBreakTransformer';
 
 @Component({
   selector: 'app-measure-soil',
@@ -69,7 +69,7 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
   }
 
   public onSensorConnect(connectionOption){
-
+    let data = {};
     if (connectionOption === 'usb') {
       this.connectUSB().then( sensorValue => {
         this.showReading(sensorValue);
@@ -79,14 +79,76 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
         this.showReading(sensorValue);
       });
     } else if (connectionOption === 'wifi') {
-      this.connectWifi().then( sensorValue => {
-        this.showReading(sensorValue);
+      this.updateWifi().then( channel => {
+        if(!isNaN(parseInt(channel))) {
+          data = {type: 'CHANNEL', value: channel};
+          console.log(data)
+          this.heyBluetooth(data);
+          //this.connectBluetooth().then( sensorValue => {
+          //  this.updateChannel(channel);
+          //});
+        } else {
+          console.log('invalid channel')
+        }
+      });
+    } else if (connectionOption === 'calibrate') {
+      this.calibrate().then( mode => {
+        if(mode.toLowerCase() == 'air' || mode.toLowerCase() == 'water') {
+          data = {type: 'CALIBRATE', value: mode};
+          console.log(data)
+          this.heyBluetooth(data);
+        } else {
+          console.log('invalid channel')
+        }
       });
     } else {
       alert('Please choose one soil sensor connection option.');
     }
   }
 
+  async heyBluetooth(data: any) {
+    const serviceUUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+    const characteristicUUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
+
+    try {
+      let jsonStr = JSON.stringify(data);
+      console.log(jsonStr);
+      let payload = this.str2ab(jsonStr);
+      await (window.navigator as any).bluetooth.requestDevice({
+          filters: [{
+            services: [serviceUUID]
+            //namePrefix: "ESP32"
+          }],
+          optionalServices: [serviceUUID] // Required to access service later.
+        })
+        .then(device => {
+          // Attempts to connect to remote GATT Server.
+          return device.gatt.connect();
+        })
+        .then(server => {
+          // Getting Service defined in the BLE server
+          return server.getPrimaryService(serviceUUID);
+        })
+        .then(service => {
+          // Getting Characteristic defined in the BLE server
+          return service.getCharacteristic(characteristicUUID);
+        })
+        .then(characteristic => {
+          return characteristic.writeValue(payload);
+        })
+        .catch(error => { console.error(error); });
+    } catch(e) {
+      console.log(e)
+    }  
+  }
+  str2ab(str) {
+    var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+    var bufView = new Uint16Array(buf);
+    for (var i=0, strLen=str.length; i<strLen; i++) {
+      bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
+  }
   showReading(sensorValue: number) {
     if(sensorValue) {
       const soilMoisture = this.sensorValueLimitCorrection(sensorValue);
@@ -95,7 +157,14 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
       this.readingCountdown();
     }
   }
-
+  async calibrate() {
+    const mode = prompt("Please enter <Water> or <Air> for calibration", );
+    return mode;
+  }
+  async updateWifi() {
+    const channel = prompt("Please enter WiFi Channel", );
+    return channel;
+  }
   async connectWifi() {
     let sensorMoisturePercantage: number;
     const ip = this.soilService.sensorIp && this.soilService.sensorIp.length > 0 ? this.soilService.sensorIp : "http://xxx.xxx.xxx.xxx/moisture.json";
@@ -145,7 +214,7 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
     try {
       await (window.navigator as any).bluetooth.requestDevice({
           filters: [{
-            name: bluetoothName
+            namePrefix: "ESP32"
           }],
           optionalServices: [serviceUUID] // Required to access service later.
         })

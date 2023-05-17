@@ -107,7 +107,12 @@ export class DialogComponent implements OnInit {
           this.show = false;
           this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
           break;  
-        case 'water_value':
+        case 'moisture':
+          this.label = 'Get Moiture';
+          this.show = false;
+          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
+          break;  
+          case 'water_value':
           this.label = 'Water Value'
           this.show = false;
           break;
@@ -130,6 +135,7 @@ export class DialogComponent implements OnInit {
       case 'water_value':
           this.msg = `${this.data.espnow}/calibrate?value=${type}&host_addr=${this.data.mac}`;
         break;
+      case 'moisture':
       case 'query':
       case 'ping':
           this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;

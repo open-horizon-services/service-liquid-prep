@@ -49,6 +49,12 @@ export class WebSocketService {
   getServers() {
     return this.localStorage.get('server-info');
   }
+  saveSensorData(data: any) {
+    this.localStorage.set('sensor-data', data);
+  }
+  getSensorData() {
+    return this.localStorage.get('sensor-data');
+  }
   showMessage(msg: string, action: string = 'OK', horizontal: MatSnackBarHorizontalPosition = 'center', vertical: MatSnackBarVerticalPosition = 'bottom') {
     let config = new MatSnackBarConfig();
     config.verticalPosition = vertical;
