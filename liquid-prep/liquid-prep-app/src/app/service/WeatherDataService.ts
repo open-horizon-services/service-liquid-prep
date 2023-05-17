@@ -1,13 +1,13 @@
-import { Inject, Injectable } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { Observable, Observer } from 'rxjs';
-import { WeatherResponse } from '../models/api/WeatherResponse';
-import { WeatherInfo, TodayWeather } from '../models/TodayWeather';
-import { DataService } from './DataService';
-import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
-import { DateTimeUtil } from '../utility/DateTimeUtil';
-import { ImageMapping } from '../models/ImageMapping';
 import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
+import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
+import { Observable, Observer } from 'rxjs';
+
+import { WeatherResponse } from '../models/api/WeatherResponse';
+import { ImageMapping } from '../models/ImageMapping';
+import { TodayWeather, WeatherInfo } from '../models/TodayWeather';
+import { DateTimeUtil } from '../utility/DateTimeUtil';
+import { DataService } from './DataService';
 
 const TODAY_WEATHER = 'today-weather';
 
@@ -26,7 +26,7 @@ export class WeatherDataService {
     this.dateTimeUtil = new DateTimeUtil();
   }
 
-  private weatherIconMappingFile = '../assets/json/weatherIconMapping.json';
+  private weatherIconMappingFile = 'assets/json/weatherIconMapping.json';
 
   public getTodayWeather(): Observable<TodayWeather> {
     const self = this;

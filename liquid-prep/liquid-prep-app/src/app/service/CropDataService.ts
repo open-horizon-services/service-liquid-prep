@@ -1,15 +1,12 @@
+import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
+import { LOCAL_STORAGE, SESSION_STORAGE, StorageService } from 'ngx-webstorage-service';
 import { Observable, Observer, of } from 'rxjs';
+
 import { Crop, Stage } from '../models/Crop';
 import { ImageMapping } from '../models/ImageMapping';
+import { DateTimeUtil } from '../utility/DateTimeUtil';
 import { DataService } from './DataService';
-import { HttpClient } from '@angular/common/http';
-import {
-  LOCAL_STORAGE,
-  SESSION_STORAGE,
-  StorageService,
-} from 'ngx-webstorage-service';
-import {DateTimeUtil} from '../utility/DateTimeUtil';
 
 const CROP_LIST_KEY = 'crop-list';
 const CROPS_STORAGE_KEY = 'my-crops';
@@ -26,9 +23,9 @@ export class CropDataService {
     private dataService: DataService
   ) {}
 
-  private cropImageMappingFile = '/assets/json/cropImageMapping.json';
-  private defaultImage = '../assets/crops-images/missing.jpg';
-  private stageImageMappingFile = '../assets/json/cropGrowthStageImageMapping.json';
+  private cropImageMappingFile = 'assets/json/cropImageMapping.json';
+  private defaultImage = 'assets/crops-images/missing.jpg';
+  private stageImageMappingFile = 'assets/json/cropGrowthStageImageMapping.json';
 
   public getCropsListData(): Observable<any> {
     return new Observable((observer: Observer<any>) => {
@@ -233,7 +230,7 @@ export class CropDataService {
             if (crop.cropGrowthStage) {
               crop.cropGrowthStage.stages.forEach((stage) => {
                 const stageUrl =
-                  '../assets/crops-images/stage' + stage.stageNumber + '.png';
+                  'assets/crops-images/stage' + stage.stageNumber + '.png';
                 stage.url = stageUrl;
               });
             }
