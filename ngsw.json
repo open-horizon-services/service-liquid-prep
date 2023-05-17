@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1684335966660,
+  "timestamp": 1684336728752,
   "index": "https://open-horizon-services.github.io/service-liquid-prep/index.html",
   "assetGroups": [
     {
@@ -11,13 +11,13 @@
         "ignoreVary": true
       },
       "urls": [
-        "https://open-horizon-services.github.io/service-liquid-prep/263.f22e35b4a5cf474a.js",
+        "https://open-horizon-services.github.io/service-liquid-prep/263.628c5334b1bf0056.js",
         "https://open-horizon-services.github.io/service-liquid-prep/favicon.ico",
         "https://open-horizon-services.github.io/service-liquid-prep/index.html",
-        "https://open-horizon-services.github.io/service-liquid-prep/main.9742b5d0268bf464.js",
+        "https://open-horizon-services.github.io/service-liquid-prep/main.d1cf6803277a568a.js",
         "https://open-horizon-services.github.io/service-liquid-prep/manifest.webmanifest",
         "https://open-horizon-services.github.io/service-liquid-prep/polyfills.1df593be9e76a8d5.js",
-        "https://open-horizon-services.github.io/service-liquid-prep/runtime.26b32f94497595d8.js",
+        "https://open-horizon-services.github.io/service-liquid-prep/runtime.e195fe8b867293b4.js",
         "https://open-horizon-services.github.io/service-liquid-prep/styles.df58e9398eb4f1fb.css"
       ],
       "patterns": []
@@ -132,7 +132,7 @@
     }
   ],
   "hashTable": {
-    "https://open-horizon-services.github.io/service-liquid-prep/263.f22e35b4a5cf474a.js": "8c0d4ffa0f92e0a7c1e2fd2c17af7fcd51e18d2d",
+    "https://open-horizon-services.github.io/service-liquid-prep/263.628c5334b1bf0056.js": "c97a55750c8c486c7dd32608680ea4be29a9ff7d",
     "https://open-horizon-services.github.io/service-liquid-prep/assets/add-first-crop.png": "93927c61e73ba2b2166fa0e2295eedad0bd0925b",
     "https://open-horizon-services.github.io/service-liquid-prep/assets/crops-images/corn.png": "8d656185e59cb51868cf31325e093807d2e1d0a0",
     "https://open-horizon-services.github.io/service-liquid-prep/assets/crops-images/missing.jpg": "a9ad054d8d4b782eb2c4c8f1ad78229be7a0f043",
@@ -170,9 +170,9 @@
     "https://open-horizon-services.github.io/service-liquid-prep/assets/icons/weatherIcons/Sun_cloud.png": "58275e082e14d8c88d23337917ae0d96506b0239",
     "https://open-horizon-services.github.io/service-liquid-prep/assets/icons/weatherIcons/Sunny.png": "e584820638b5ea52342ac43a879c80f81de23c13",
     "https://open-horizon-services.github.io/service-liquid-prep/assets/icons/weatherIcons/Thunderstorm.png": "653c281dce9ccbb863cffad6ebe29a7afb8d3bf5",
-    "https://open-horizon-services.github.io/service-liquid-prep/assets/json/cropGrowthStageImageMapping.json": "8fe30605adea936a276caf2d085239559d9cc4ca",
-    "https://open-horizon-services.github.io/service-liquid-prep/assets/json/cropImageMapping.json": "a4dda4d519a04c54685f0cddbf65aef6f0350549",
-    "https://open-horizon-services.github.io/service-liquid-prep/assets/json/weatherIconMapping.json": "13a87ba5b6b1813a50d633691dabdde000909751",
+    "https://open-horizon-services.github.io/service-liquid-prep/assets/json/cropGrowthStageImageMapping.json": "2fbad75c4ff5564c82403ea82091b4fb5b521389",
+    "https://open-horizon-services.github.io/service-liquid-prep/assets/json/cropImageMapping.json": "0cbca4f9a546209a2b70390a1832a1ce627552b9",
+    "https://open-horizon-services.github.io/service-liquid-prep/assets/json/weatherIconMapping.json": "34512bf02c589666971043473a55484a4e722e4f",
     "https://open-horizon-services.github.io/service-liquid-prep/assets/low-moisture.png": "e54539df0d0c52524013b7fdd03b804fc28a8fac",
     "https://open-horizon-services.github.io/service-liquid-prep/assets/measure-guide/connect-to-sensor.png": "0d293aa7db1989e67a91449bd86bbb4200757900",
     "https://open-horizon-services.github.io/service-liquid-prep/assets/measure-guide/graphic-1.png": "8af4a9f5bcc432ab11cb698e9f37b50fcdc5a18b",
@@ -201,11 +201,11 @@
     "https://open-horizon-services.github.io/service-liquid-prep/assets/welcome-measure.png": "9d972fe21fde0071deb8cd4e82c4accdd9da78b4",
     "https://open-horizon-services.github.io/service-liquid-prep/assets/welcome-plant.png": "e66b3e44dbfa6792bc4d159b1d3aaf524325de44",
     "https://open-horizon-services.github.io/service-liquid-prep/favicon.ico": "442837ce83923bd36a44200c7cbc651ad6ddd2bd",
-    "https://open-horizon-services.github.io/service-liquid-prep/index.html": "3ea14995d0689b7cdd1bad543ce164795f706680",
-    "https://open-horizon-services.github.io/service-liquid-prep/main.9742b5d0268bf464.js": "75d8b245133c4202edcfcf74e61ef0a7c8ce14fd",
+    "https://open-horizon-services.github.io/service-liquid-prep/index.html": "27ed4e50c547c865ef105d8591a36f680c20e274",
+    "https://open-horizon-services.github.io/service-liquid-prep/main.d1cf6803277a568a.js": "ccd41e4e97c458811629d35b40f7b6324526d7c9",
     "https://open-horizon-services.github.io/service-liquid-prep/manifest.webmanifest": "dabdac21beabdb105a868e82c76f8074e2718623",
     "https://open-horizon-services.github.io/service-liquid-prep/polyfills.1df593be9e76a8d5.js": "e56286495d14fa76a83eaf3a94a164925ad2e9aa",
-    "https://open-horizon-services.github.io/service-liquid-prep/runtime.26b32f94497595d8.js": "511e801d88c051eebf904bc5f70f3ebb9ec42def",
+    "https://open-horizon-services.github.io/service-liquid-prep/runtime.e195fe8b867293b4.js": "75b111fbbfb94b0c7b3f451194b9273363935393",
     "https://open-horizon-services.github.io/service-liquid-prep/styles.df58e9398eb4f1fb.css": "a7b3d80fe7af09b029b2d30964ca2b50241b259e"
   },
   "navigationUrls": [
