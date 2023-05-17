@@ -132,7 +132,7 @@ export class Server {
     });
 
     const server = http.createServer({
-      key: readFileSync('lp-Server.key'),
+      key: readFileSync('lp-server.key'),
       cert: readFileSync('lp-server.cert') 
     }, app);
     this.utils = new Utils(server, this.port);
