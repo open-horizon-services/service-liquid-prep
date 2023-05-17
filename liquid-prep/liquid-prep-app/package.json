@@ -1,6 +1,6 @@
 {
   "name": "liquid-prep-app",
-  "version": "1.0.0",
+  "version": "1.0.8",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -11,7 +11,8 @@
     "deploy": "scripts/deploy.js",
     "build-prod": "ng build --configuration production",
     "serve-prod": "npm run build-prod && cd dist/liquid-prep-app && http-server -c-1",
-    "deploy-github": "ng build --configuration production=true --outputPath=docs --baseHref=/Liquid-Prep/",
+    "test-locally": "/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --user-data-dir=/tmp/foo --ignore-certificate-errors --unsafely-treat-insecure-origin-as-secure=https://localhost:3003",
+    "deploy-github-pages": "ng deploy --base-href=https://open-horizon-services.github.io/service-liquid-prep/",
     "postinstall": "ngcc",
     "http-server": "http-server -o"
   },
@@ -46,6 +47,8 @@
     "@angular/language-service": "^14.1.2",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "^2.0.3",
+    "@types/node": "^14.11.1",
+    "angular-cli-ghpages": "^1.0.5",
     "codelyzer": "^6.0.2",
     "jasmine-core": "^4.3.0",
     "jasmine-spec-reporter": "^7.0.0",

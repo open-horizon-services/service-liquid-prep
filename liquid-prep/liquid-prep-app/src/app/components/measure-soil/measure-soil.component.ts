@@ -58,9 +58,9 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
   ]);
   public moistureIcon = undefined;
   public soilMoistureIconMap = new Map([
-    ['LOW', '/assets/moisture-water/soil_moisture_low.png'],
-    ['MEDIUM', '/assets/moisture-water/soil_moisture_medium.png'],
-    ['HIGH', '/assets/moisture-water/soil_moisture_high.png']
+    ['LOW', 'assets/moisture-water/soil_moisture_low.png'],
+    ['MEDIUM', 'assets/moisture-water/soil_moisture_medium.png'],
+    ['HIGH', 'assets/moisture-water/soil_moisture_high.png']
   ]);
 
   ngOnInit(): void { }

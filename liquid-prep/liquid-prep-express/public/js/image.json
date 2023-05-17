@@ -4,8 +4,18 @@
       "bbox": [
         {
           "detectedBox": [
-            "0.43",
-            "0.26",
+            "0.02",
+            "0.28",
+            "0.41",
+            "0.54"
+          ],
+          "detectedClass": "hardhat",
+          "detectedScore": "1.00"
+        },
+        {
+          "detectedBox": [
+            "0.42",
+            "0.18",
             "1.00",
             "0.53"
           ],
@@ -14,26 +24,16 @@
         },
         {
           "detectedBox": [
-            "0.02",
-            "0.33",
-            "0.41",
-            "0.53"
-          ],
-          "detectedClass": "hardhat",
-          "detectedScore": "1.00"
-        },
-        {
-          "detectedBox": [
-            "0.01",
-            "0.24",
+            "0.04",
+            "0.17",
             "1.00",
-            "0.58"
+            "0.62"
           ],
           "detectedClass": "person",
           "detectedScore": "0.99"
         }
       ],
-      "elapsedTime": 2429
+      "elapsedTime": 2249
     }
   },
   "version": {
@@ -42,5 +42,5 @@
   },
   "confidentCutoff": 0.5,
   "platform": "darwin:arm64",
-  "timestamp": 1684012029672
+  "timestamp": 1684291123448
 }
