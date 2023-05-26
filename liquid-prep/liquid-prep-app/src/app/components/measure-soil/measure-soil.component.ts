@@ -92,9 +92,9 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
         }
       });
     } else if (connectionOption === 'calibrate') {
-      this.calibrate().then( mode => {
-        if(mode.toLowerCase() == 'air' || mode.toLowerCase() == 'water') {
-          data = {type: 'CALIBRATE', value: mode};
+      this.calibrate().then( result => {
+        if(result) {
+          data = {type: 'CALIBRATE', value: result.mode, calibrationValue: result.value};
           console.log(data)
           this.heyBluetooth(data);
         } else {
@@ -109,38 +109,38 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
   async heyBluetooth(data: any) {
     const serviceUUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
     const characteristicUUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
-
+  
     try {
       let jsonStr = JSON.stringify(data);
       console.log(jsonStr);
       let payload = this.str2ab(jsonStr);
+  
       await (window.navigator as any).bluetooth.requestDevice({
-          filters: [{
-            services: [serviceUUID]
-            //namePrefix: "ESP32"
-          }],
-          optionalServices: [serviceUUID] // Required to access service later.
-        })
-        .then(device => {
-          // Attempts to connect to remote GATT Server.
-          return device.gatt.connect();
-        })
-        .then(server => {
-          // Getting Service defined in the BLE server
-          return server.getPrimaryService(serviceUUID);
-        })
-        .then(service => {
-          // Getting Characteristic defined in the BLE server
-          return service.getCharacteristic(characteristicUUID);
-        })
-        .then(characteristic => {
-          return characteristic.writeValue(payload);
-        })
-        .catch(error => { console.error(error); });
+        filters: [{
+          services: [serviceUUID]
+        }],
+        optionalServices: [serviceUUID] // Required to access service later.
+      })
+      .then(device => {
+        // Attempts to connect to remote GATT Server.
+        return device.gatt.connect();
+      })
+      .then(server => {
+        // Getting Service defined in the BLE server
+        return server.getPrimaryService(serviceUUID);
+      })
+      .then(service => {
+        // Getting Characteristic defined in the BLE server
+        return service.getCharacteristic(characteristicUUID);
+      })
+      .then(characteristic => {
+        return characteristic.writeValue(payload);
+      })
+      .catch(error => { console.error(error); });
     } catch(e) {
       console.log(e)
-    }  
-  }
+    }
+  }  
   str2ab(str) {
     var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
     var bufView = new Uint16Array(buf);
@@ -159,7 +159,16 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
   }
   async calibrate() {
     const mode = prompt("Please enter <Water> or <Air> for calibration", );
-    return mode;
+    if (mode.toLowerCase() == 'air' || mode.toLowerCase() == 'water') {
+      const value = prompt(`Please enter calibration value for ${mode}`);
+      if(value && !isNaN(Number(value))) {
+        return {mode: mode, value: Number(value)};
+      } else {
+        console.log('Invalid value for calibration');
+      }
+    } else {
+      console.log('Invalid mode for calibration');
+    }
   }
   async updateWifi() {
     const channel = prompt("Please enter WiFi Channel", );
