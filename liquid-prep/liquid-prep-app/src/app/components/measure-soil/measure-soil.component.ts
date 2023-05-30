@@ -158,18 +158,22 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
     }
   }
   async calibrate() {
-    const mode = prompt("Please enter <Water> or <Air> for calibration", );
+    const mode = prompt("Please enter <Water> or <Air> for calibration");
     if (mode.toLowerCase() == 'air' || mode.toLowerCase() == 'water') {
-      const value = prompt(`Please enter calibration value for ${mode}`);
-      if(value && !isNaN(Number(value))) {
-        return {mode: mode, value: Number(value)};
-      } else {
-        console.log('Invalid value for calibration');
-      }
+        let value = prompt(`Please enter calibration value for ${mode} (enter -1 to use default value)`);
+        if (value && !isNaN(Number(value))) {
+            if(Number(value) === -1) {
+                return {mode: mode, value: null};
+            }
+            return { mode: mode, value: Number(value) };
+        } else {
+            console.log('Invalid value for calibration');
+        }
     } else {
-      console.log('Invalid mode for calibration');
+        console.log('Invalid mode for calibration');
     }
-  }
+}
+
   async updateWifi() {
     const channel = prompt("Please enter WiFi Channel", );
     return channel;
