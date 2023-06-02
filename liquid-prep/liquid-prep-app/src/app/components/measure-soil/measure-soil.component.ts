@@ -14,6 +14,7 @@ import { LineBreakTransformer } from './LineBreakTransformer';
   templateUrl: './measure-soil.component.html',
   styleUrls: ['./measure-soil.component.scss'],
 })
+
 export class MeasureSoilComponent implements OnInit, AfterViewInit {
   constructor(
     private router: Router,
@@ -68,6 +69,8 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
   }
 
+  
+
   public onSensorConnect(connectionOption){
     let data = {};
     if (connectionOption === 'usb') {
@@ -94,11 +97,16 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
     } else if (connectionOption === 'calibrate') {
       this.calibrate().then( result => {
         if(result) {
-          data = {type: 'CALIBRATE', value: result.mode, calibrationValue: result.value};
-          console.log(data)
+          data = {
+            type: 'CALIBRATE',
+            calibrationType: result.calibrationType,
+            mode: result.mode,
+            calibrationValue: result.value
+          };
+          console.log(data);
           this.heyBluetooth(data);
         } else {
-          console.log('invalid channel')
+          console.log('invalid channel');
         }
       });
     } else {
@@ -158,19 +166,18 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
     }
   }
   async calibrate() {
-    const mode = prompt("Please enter <Water> or <Air> for calibration");
-    if (mode.toLowerCase() == 'air' || mode.toLowerCase() == 'water') {
-        let value = prompt(`Please enter calibration value for ${mode} (enter -1 to use default value)`);
-        if (value && !isNaN(Number(value))) {
-            if(Number(value) === -1) {
-                return {mode: mode, value: null};
-            }
-            return { mode: mode, value: Number(value) };
-        } else {
-            console.log('Invalid value for calibration');
-        }
-    } else {
-        console.log('Invalid mode for calibration');
+    const calibrationType = prompt("Please enter <Manual> or <Default> for calibration");
+
+    if (calibrationType.toLowerCase() === 'manual') {
+        const value = prompt("Please enter calibration value for sensor");
+        return { calibrationType: calibrationType, mode: 'manual', value: value };
+    }
+    else if (calibrationType.toLowerCase() === 'default') {
+        const mode = prompt("Please enter <Water> or <Air> for calibration");
+        return { calibrationType: calibrationType, mode: mode };
+    }
+    else {
+        console.log('Invalid calibration type');
     }
 }
 
