@@ -146,6 +146,11 @@ export class DialogComponent implements OnInit {
         break;
       case 'moisture':
       case 'query':
+      case 'custom_value':
+        // want to calibrate with a custom given value
+        this.msg = `${this.data.espnow}/calibrate?value=${this.newValue}&host_addr=${this.data.mac}`;
+
+        break;
       case 'ping':
           this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
         break;  
