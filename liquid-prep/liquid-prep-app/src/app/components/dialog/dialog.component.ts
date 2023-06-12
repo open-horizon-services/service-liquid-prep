@@ -72,6 +72,11 @@ export class DialogComponent implements OnInit {
           this.label = 'Water Value'
           this.show = false;
           break;
+        case 'custom_value':
+          this.label = 'Value'
+          this.newValue = this.data.title;
+          this.show = true;
+          break;
         case 'esp_interval':
           this.label = 'Interval'
           this.newValue = "";
@@ -114,6 +119,10 @@ export class DialogComponent implements OnInit {
           break;  
           case 'water_value':
           this.label = 'Water Value'
+          this.show = false;
+          break;
+          case 'custom_value':
+          this.label = 'Custom Value'
           this.show = false;
           break;
         case 'esp_interval':

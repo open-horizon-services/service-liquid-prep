@@ -68,9 +68,6 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
   }
-
-  
-
   public onSensorConnect(connectionOption){
     let data = {};
     if (connectionOption === 'usb') {
@@ -169,7 +166,7 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
     const calibrationType = prompt("Please enter <Manual> or <Default> for calibration");
 
     if (calibrationType.toLowerCase() === 'manual') {
-        const value = prompt("Please enter calibration value for sensor");
+        const value = prompt("Please enter Moisture Calibration value for sensor");
         return { calibrationType: calibrationType, mode: 'manual', value: value };
     }
     else if (calibrationType.toLowerCase() === 'default') {

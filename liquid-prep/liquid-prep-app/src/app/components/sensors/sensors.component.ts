@@ -47,6 +47,7 @@ export class SensorsComponent implements OnInit {
     {value: 'device_name', text: 'Device Name'},
     {value: 'air_value', text: 'Calibrate Air'},
     {value: 'water_value', text: 'Calibrate Water'},
+    {value: 'custom_value', text: 'Calibrate Custom'},
     {value: 'esp_interval', text: 'Interval'},
     {value: 'ping', text: 'Ping Sensor'},
     {value: 'query', text: 'Query Sensor'},
