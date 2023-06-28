@@ -4,6 +4,7 @@ export class Crop {
   id: string;
   cropName: string;
   type: string;
+  soilType: string;
   cropGrowthStage: CropGrowthStage;
   url: string; // crop image mapping url
   seedingDate: Date;
