@@ -1,14 +1,15 @@
 // import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { Injectable } from '@angular/core';
+import { Observable, Observer } from 'rxjs';
+
 import { Advice } from '../models/Advice';
-import {Crop, Stage} from '../models/Crop';
+import { Crop, Stage } from '../models/Crop';
+import { SoilMoisture } from '../models/SoilMoisture';
 import { TodayWeather, WeatherInfo } from '../models/TodayWeather';
 import { DateTimeUtil } from '../utility/DateTimeUtil';
 import { CropDataService } from './CropDataService';
-import { WeatherDataService } from './WeatherDataService';
 import { SoilMoistureService } from './SoilMoistureService';
-import { SoilMoisture } from '../models/SoilMoisture';
-import { Observable, Observer } from 'rxjs';
-import { Injectable } from '@angular/core';
+import { WeatherDataService } from './WeatherDataService';
 
 @Injectable({
     providedIn: 'root',
@@ -18,29 +19,29 @@ export class WaterAdviceService {
     public moistureWaterMap = new Map([
       ['None', new Map(
         [
-          ['LOW', '/assets/moisture-water/nowater_lowmoisture.png'],
-          ['MEDIUM', '/assets/moisture-water/nowater_mediummoisture.png'],
-          ['HIGH', '/assets/moisture-water/nowater_highmoisture.png']
+          ['LOW', 'assets/moisture-water/nowater_lowmoisture.png'],
+          ['MEDIUM', 'assets/moisture-water/nowater_mediummoisture.png'],
+          ['HIGH', 'assets/moisture-water/nowater_highmoisture.png']
         ])],
       ['Little', new Map(
         [
-          ['LOW', '/assets/moisture-water/littlewater_lowmoisture.png'],
-          ['MEDIUM', '/assets/moisture-water/littlewater_mediummoisture.png'],
-          ['HIGH', '/assets/moisture-water/littlewater_highmoisture.png']
+          ['LOW', 'assets/moisture-water/littlewater_lowmoisture.png'],
+          ['MEDIUM', 'assets/moisture-water/littlewater_mediummoisture.png'],
+          ['HIGH', 'assets/moisture-water/littlewater_highmoisture.png']
         ]
       )],
       ['Modest', new Map(
         [
-          ['LOW', '/assets/moisture-water/moderatewater_lowmoisture.png'],
-          ['MEDIUM', '/assets/moisture-water/moderatewater_mediummoisture.png'],
-          ['HIGH', '/assets/moisture-water/moderatewater_highmoisture.png']
+          ['LOW', 'assets/moisture-water/moderatewater_lowmoisture.png'],
+          ['MEDIUM', 'assets/moisture-water/moderatewater_mediummoisture.png'],
+          ['HIGH', 'assets/moisture-water/moderatewater_highmoisture.png']
         ]
       )],
       ['Plenty', new Map(
         [
-          ['LOW', '/assets/moisture-water/lotswater_lowmoisture.png'],
-          ['MEDIUM', '/assets/moisture-water/lotswater_mediummoisture.png'],
-          ['HIGH', '/assets/moisture-water/lotswater_highmoisture.png']
+          ['LOW', 'assets/moisture-water/lotswater_lowmoisture.png'],
+          ['MEDIUM', 'assets/moisture-water/lotswater_mediummoisture.png'],
+          ['HIGH', 'assets/moisture-water/lotswater_highmoisture.png']
         ]
       )]
     ]);

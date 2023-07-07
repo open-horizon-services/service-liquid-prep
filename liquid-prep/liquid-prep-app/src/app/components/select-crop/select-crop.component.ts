@@ -1,6 +1,6 @@
+import { Location } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import {Router} from '@angular/router';
-import {Location} from '@angular/common';
+import { Router } from '@angular/router';
 
 import { CropListResponse } from '../../models/api/CropListResponse';
 import { Crop } from '../../models/Crop';
@@ -36,7 +36,7 @@ export class SelectCropComponent implements OnInit{
         (cropsListResponse) => {
           this.requestingCrop = false;
           if (cropsListResponse === undefined || cropsListResponse.length === 0) {
-            this.NO_NEW_CROPS = '../../assets/crops-images/noNewCrops.PNG';
+            this.NO_NEW_CROPS = 'assets/crops-images/noNewCrops.PNG';
           } else {
             this.cropsList = cropsListResponse;
           }

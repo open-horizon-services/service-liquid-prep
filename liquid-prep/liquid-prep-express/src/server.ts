@@ -1,7 +1,8 @@
 import cors from 'cors';
 import express from 'express';
 import fileUpload from 'express-fileupload';
-import * as http from 'http';
+import { readFileSync } from 'fs';
+import * as http from 'https';
 import { util } from 'liquid-prep-lib';
 import path from 'path';
 
@@ -130,7 +131,10 @@ export class Server {
       })  
     });
 
-    const server = http.createServer(app);
+    const server = http.createServer({
+      key: readFileSync('lp-server.key'),
+      cert: readFileSync('lp-server.cert') 
+    }, app);
     this.utils = new Utils(server, this.port);
   }
   setInteractive = () => {
