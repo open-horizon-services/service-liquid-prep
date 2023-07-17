@@ -147,9 +147,12 @@ export class CropDataService {
     return filteredCropList;
   }
 
-  public storeMyCropsInLocalStorage(crop: Crop) {
+  public storeMyCropsInLocalStorage(crop: Crop, soilType: string) {
     const cropsData = new Array<Crop>();
     this.getMyCrops().subscribe((myCrops) => {
+      // Set the soilType for the crop
+      crop.soilType = soilType;
+  
       // If the crops list is empty in local storage then store the crop
       // Else store the crop if its not already existing.
       if (myCrops.length === 0) {
@@ -166,6 +169,7 @@ export class CropDataService {
       }
     });
   }
+  
 
   public deleteMyCrop(cropId) {
     this.getMyCropsFromLocalStorage()
