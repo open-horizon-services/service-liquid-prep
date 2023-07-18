@@ -122,6 +122,16 @@ export class DialogComponent implements OnInit {
           this.show = true;
           this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&interval=${this.newValue}&web_request=true`;
           break;
+        case 'enable_bluetooth':
+          this.label = 'Enable Bluetooth'
+          this.show = false;
+          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
+          break;
+        case 'disable_bluetooth':
+          this.label = 'Disable Bluetooth'
+          this.show = false;
+          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
+          break;
         }
     }
   }
