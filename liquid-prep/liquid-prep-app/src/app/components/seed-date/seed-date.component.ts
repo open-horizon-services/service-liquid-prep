@@ -32,7 +32,14 @@ export class SeedDateComponent implements OnInit {
       .subscribe(
         (cropData) => {
           this.crop = cropData;
-          this.stages = cropData.cropGrowthStage.stages;
+          if (cropData && cropData.cropGrowthStage) {
+            this.stages = cropData.cropGrowthStage.stages;
+        } else {
+        //    console.error('cropGrowthStage is undefined');
+            this.stages = [];
+                  
+          }
+        
         },
         (err) => {
           alert('Could not get crop info: ' + err);
