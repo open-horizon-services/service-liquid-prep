@@ -101,6 +101,13 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
           console.log('invalid channel')
         }
       });
+    } else if (connectionOption === 'ble_name') {
+      this.updateWifi().then( name => {
+        data = {type: 'NAME', value: name};
+        console.log(data)
+        this.heyBluetooth(data);
+      });
+
     } else {
       alert('Please choose one soil sensor connection option.');
     }
