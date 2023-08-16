@@ -102,7 +102,7 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
         }
       });
     } else if (connectionOption === 'ble_name') {
-      this.updateWifi().then( name => {
+      this.updateBLE().then( name => {
         data = {type: 'NAME', value: name};
         console.log(data)
         this.heyBluetooth(data);
@@ -170,6 +170,10 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
   }
   async updateWifi() {
     const channel = prompt("Please enter WiFi Channel", );
+    return channel;
+  }
+  async updateBLE() {
+    const channel = prompt("Please enter new Device Name", );
     return channel;
   }
   async connectWifi() {
