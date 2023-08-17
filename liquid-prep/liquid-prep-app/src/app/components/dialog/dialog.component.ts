@@ -72,6 +72,12 @@ export class DialogComponent implements OnInit {
           this.label = 'Water Value'
           this.show = false;
           break;
+        case 'enable_bluetooth':
+          this.show = false;
+          break;
+        case 'disable_bluetooth':
+          this.show = false;
+          break;
         case 'esp_interval':
           this.label = 'Interval'
           this.newValue = "";
@@ -112,7 +118,7 @@ export class DialogComponent implements OnInit {
           this.show = false;
           this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
           break;  
-          case 'water_value':
+        case 'water_value':
           this.label = 'Water Value'
           this.show = false;
           break;
@@ -125,12 +131,10 @@ export class DialogComponent implements OnInit {
         case 'enable_bluetooth':
           this.label = 'Enable Bluetooth'
           this.show = false;
-          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
           break;
         case 'disable_bluetooth':
           this.label = 'Disable Bluetooth'
           this.show = false;
-          this.msg = `${this.data.espnow}/${type}?host_addr=${this.data.mac}&web_request=true`;
           break;
         }
     }
@@ -154,7 +158,11 @@ export class DialogComponent implements OnInit {
       case 'esp_interval':
         this.msg = `${this.data.espnow}/update?host_addr=${this.data.mac}&${type}=${this.newValue}`;
         break;
-    }
+      case 'enable_bluetooth':
+      case 'disable_bluetooth':
+        this.msg = `${this.data.espnow}/update?host_addr=${this.data.mac}&${type}=`;
+        break;
+      }
     this.webSocketService.wsConnect(this.data.ws);
     this.webSocketService.sendMsg('LP', {from: 'WEB_REQUEST', msg: this.msg});
   }  
