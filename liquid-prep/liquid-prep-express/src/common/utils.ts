@@ -45,7 +45,10 @@ export enum Task {
   CALIBRATE_RESULT = 19,
   BROADCAST = 20,
   WEB_REQUEST = 21,
-  WEB_REQUEST_RESULT = 22
+  WEB_REQUEST_RESULT = 22,
+  UPDATE_WIFI_RESULT = 23,
+  ENABLE_BLUETOOTH = 24,
+  DISABLE_BLUETOOTH = 25
 };
 export class Utils {
   homePath = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
@@ -162,7 +165,8 @@ export class Utils {
       channel: msg[3],
       senderMac: msg[4],
       receiverMac: msg[5],
-      moisture: msg[6]
+      moisture: msg[6],
+      bluetooth: msg[7] == 1 ? 'On' : 'Off'
     }
     console.log(`${title}: %j\n` , res)
     return res;

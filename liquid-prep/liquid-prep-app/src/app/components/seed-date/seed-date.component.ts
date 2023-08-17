@@ -37,7 +37,14 @@ export class SeedDateComponent implements OnInit {
       .subscribe(
         (cropData) => {
           this.crop = cropData;
-          this.stages = cropData.cropGrowthStage.stages;
+          if (cropData && cropData.cropGrowthStage) {
+            this.stages = cropData.cropGrowthStage.stages;
+        } else {
+        //    console.error('cropGrowthStage is undefined');
+            this.stages = [];
+                  
+          }
+        
         },
         (err) => {
           alert('Could not get crop info: ' + err);
@@ -75,7 +82,7 @@ export class SeedDateComponent implements OnInit {
   // @return The current crop growth stage
   private identifyGrowthStage(numberOfDaysFromSeedingDate) {
     let stage: Stage;
-    const cummulativeStagesLength: number[] = [this.stages[0].stageLength];
+    const cummulativeStagesLength: number[] = (this.stages.length > 0) ? [this.stages[0].stageLength] : [];
     for (let i = 1; i < this.stages.length; i++){
       cummulativeStagesLength[i] = cummulativeStagesLength[i - 1] + this.stages[i].stageLength;
     }
