@@ -12,18 +12,26 @@
       </button>
     </mat-toolbar-row>
   </mat-toolbar>
-
   <div class="select-date-container">
     <img mat-card-image class="cardImg" src="assets/select-seed.png" alt="select seed date" />
     <label class="label">Select a seed date</label>
     <mat-form-field class="datePicker" appearance="fill">
-      <input matInput [matDatepicker]="picker"[max]="maxDate" [(ngModel)]="userSelectiondate">
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker touchUi #picker></mat-datepicker>
+        <input matInput [matDatepicker]="picker" [max]="maxDate" [(ngModel)]="userSelectiondate">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker touchUi #picker></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field class="select" appearance="fill">
+        <mat-label>Soil Type</mat-label>
+        <mat-select [(value)]="selectedSoilType">
+            <mat-option value="Sand">Sand</mat-option>
+            <mat-option value="Clay">Clay</mat-option>
+        </mat-select>
     </mat-form-field>
     <div class="dateAgo">
-      {{userSelectiondate | dateAgo}}
+        {{userSelectiondate | dateAgo}}
     </div>
     <button mat-flat-button class="c-btn" (click)="clickConfirm(userSelectiondate)">CONFIRM</button>
   </div>
+  
+
 </div>
