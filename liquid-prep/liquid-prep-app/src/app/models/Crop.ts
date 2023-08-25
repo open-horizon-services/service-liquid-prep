@@ -1,4 +1,4 @@
-import {DateTimeUtil} from '../utility/DateTimeUtil';
+import {CropFacts, PlantGrowthStage} from './api/CropInfoResp';
 
 export class Crop {
   id: string;
@@ -6,7 +6,9 @@ export class Crop {
   type: string;
   cropGrowthStage: CropGrowthStage;
   url: string; // crop image mapping url
+  facts: CropFacts;
   seedingDate: Date;
+  stage: PlantGrowthStage;
 }
 
 export class CropGrowthStage {
@@ -24,8 +26,7 @@ export class Stage {
   stage: string;
   waterUse: number;
   stageLength: number;
-  rootDeptMin: number;
-  rootDepthMax: number;
+  rootDepth: number;
   url: string;
   age: number; // the days since the crop was planted
 }
