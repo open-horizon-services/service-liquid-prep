@@ -132,8 +132,8 @@ export class Server {
     });
 
     const server = http.createServer({
-      key: readFileSync('lp-server.key'),
-      cert: readFileSync('lp-server.cert') 
+      key: readFileSync('star_liquid-prep_org.key'),
+      cert: readFileSync('star_liquid-prep_org.crt') 
     }, app);
     this.utils = new Utils(server, this.port);
   }
