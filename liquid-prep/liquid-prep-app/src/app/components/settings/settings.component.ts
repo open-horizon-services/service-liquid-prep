@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { HeaderService } from 'src/app/service/header.service';
 
 @Component({
   selector: 'app-settings',
@@ -10,20 +9,9 @@ import { HeaderService } from 'src/app/service/header.service';
 })
 export class SettingsComponent implements OnInit {
 
-  constructor(
-    private router: Router,
-    private location: Location,
-    private headerService: HeaderService
-    ) { }
+  constructor(private router: Router, private location: Location) { }
 
   ngOnInit(): void {
-    this.headerService.updateHeader(
-      'Settings',   // headerTitle
-      'arrow_back', // leftIconName
-      'volume_up',   // rightIconName
-      this.handleLeftClick.bind(this),  // leftBtnClick
-      null,          // rightBtnClick
-    );
   }
 
   public volumeClicked() {
@@ -33,16 +21,4 @@ export class SettingsComponent implements OnInit {
   public backClicked() {
     this.location.back();
   }
-
-  public handleLeftClick(data:string){
-    this.backClicked();
-  }
-
-  // public onHeaderClick(data:string){
-  //   if(data == 'leftBtn'){
-  //     this.backClicked();
-  //   }else {
-  //     //TODO
-  //   }
-  // }
 }

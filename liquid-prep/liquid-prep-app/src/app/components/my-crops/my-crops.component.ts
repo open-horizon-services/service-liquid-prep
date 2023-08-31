@@ -1,17 +1,12 @@
-import {Component, OnInit, Input, ApplicationRef, NgZone} from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { formatDate, Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-import { Crop } from '../../models/Crop';
-import { WeatherDataService } from 'src/app/service/WeatherDataService';
-import { WaterAdviceService } from 'src/app/service/WaterAdviceService';
+import { Router } from '@angular/router';
 import { TodayWeather } from 'src/app/models/TodayWeather';
 import { CropDataService } from 'src/app/service/CropDataService';
-import { DateTimeUtil } from 'src/app/utility/DateTimeUtil';
-import { DeleteCropComponent } from '../delete-crop/delete-crop.component';
-import { HeaderService } from 'src/app/service/header.service';
+import { WeatherDataService } from 'src/app/service/WeatherDataService';
 
+import { Crop } from '../../models/Crop';
 
 @Component({
   selector: 'app-my-crops',
@@ -20,13 +15,13 @@ import { HeaderService } from 'src/app/service/header.service';
 })
 export class MyCropsComponent implements OnInit {
   myCrops: Crop[];
-  seedingDate: '';
   displayedColumns: string[] = ['EmptyColumnTitle'];
 
   tabs = ['My Crops', 'Settings'];
   activeTab = this.tabs[0];
   background: ThemePalette = undefined;
-  seedDate =  null;
+
+  isCameraDisabled = false;
 
   public currentDate = '';
   public weatherIconDay = '';
@@ -40,42 +35,28 @@ export class MyCropsComponent implements OnInit {
 
   constructor(
     private router: Router, private location: Location,
-    private weatherService: WeatherDataService,
-    private cropDataService: CropDataService,
-    public dialog: MatDialog,
-    private headerService: HeaderService
+    private weatherService: WeatherDataService, private cropDataService: CropDataService
     ) {
     this.updateWeatherInfo();
   }
 
   ngOnInit(): void {
+    //this.isCameraDisabled = location.hostname.indexOf('localhost') < 0 && location.protocol !== 'https';
 
-    this.cropDataService.getLocalStorageMyCrops().then(
-      (myCrops) => {
-        this.myCrops = myCrops;
-        if (this.myCrops.length > 0){
-          this.myCropStatus = 'crop-selected';
-        }
+    this.cropDataService.getMyCrops().subscribe(myCrops => {
+      this.myCrops = myCrops;
+      if (this.myCrops.length > 0){
+        this.myCropStatus = 'crop-selected';
       }
-    );
+    });
+
+    this.currentDate =  formatDate(new Date(), 'MMMM d, yyyy', 'en');
 
     // TODO: Add weather template
     /*this.dataService.getWeatherInfo().subscribe((weatherInfo: WeatherResponse) => {
       const todayWeather = WeatherService.getInstance().createTodayWeather(weatherInfo);
     });*/
 
-    this.headerService.updateHeader(
-      'My Crops',   // headerTitle
-      'arrow_back',       // leftIconName
-      'volume_up',  // rightIconName
-      this.handleLeftClick.bind(this),    // leftBtnClick
-      undefined,    // rightBtnClick
-    );
-
-  }
-
-  public handleLeftClick(data: string){
-    this.backClicked();
   }
 
   public tabClicked(tab) {
@@ -108,23 +89,20 @@ export class MyCropsComponent implements OnInit {
 
   onViewCropAdvice(crop: Crop) {
     this.cropDataService.storeSelectedCropIdInSession(crop.id);
-    this.router.navigate(['advice/' + crop.id]).then(r => {});
+    this.router.navigate(['advice']).then(r => {});
   }
 
   onRemoveCrop(crop: Crop) {
-    this.cropDataService.removeCropFromLocalStorage(crop.id).then(r => window.location.reload());
+    this.cropDataService.deleteMyCrop(crop.id);
+    window.location.reload();
   }
 
   onAdd1stCrop() {
     this.router.navigateByUrl('/select-crop').then(r => {});
   }
 
-  public onHeaderClick(data:string){
-    if(data == 'leftBtn'){
-      this.backClicked();
-    }else {
-      //TODO
-    }
+  inspect() {
+    this.router.navigateByUrl('/inspect').then(r => {});
   }
 
   updateWeatherInfo(){
@@ -146,15 +124,4 @@ export class MyCropsComponent implements OnInit {
     alert(msg ? msg : this.errorMessage);
   }
 
-  openDeleteCropDialog(crop: Crop): void {
-    const dialogRef2: MatDialogRef<DeleteCropComponent> = this.dialog.open(DeleteCropComponent, {
-      width: '80%',
-      panelClass: 'delete-crop-dialog',
-      data: crop,
-    });
-
-    dialogRef2.componentInstance.onDelete.subscribe(() => {
-      this.onRemoveCrop(crop);
-    });
-  }
 }
