@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { formatDate } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router} from '@angular/router';
 
 import { WaterAdviceService } from 'src/app/service/WaterAdviceService';
+import { Crop } from '../../models/Crop';
+import { CropDataService } from '../../service/CropDataService';
+import { CropStaticInfo } from '../../models/CropStatic';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-advice',
@@ -11,6 +15,8 @@ import { WaterAdviceService } from 'src/app/service/WaterAdviceService';
 })
 export class AdviceComponent implements OnInit {
 
+  crop: Crop;
+  cropStatic: CropStaticInfo;
   currentDate = '';
   waterRecommeded = undefined;
   wateringDecision = '';
@@ -22,6 +28,7 @@ export class AdviceComponent implements OnInit {
   rainfallPercentage: number = undefined;
   rainfallIndex: string = undefined;
   weatherIcon: string = null;
+  cropImage: string = null;
 
   adviceImg = undefined; // this.ADVICE_IMAGES[0];
 
@@ -32,17 +39,30 @@ export class AdviceComponent implements OnInit {
     ['HIGH', 'color-high']
   ]);
 
+  private datePipe: DatePipe = new DatePipe('en-US');
+
+
   constructor(
+    private route: ActivatedRoute,
     private router: Router,
-    private waterAdviceService: WaterAdviceService
+    private waterAdviceService: WaterAdviceService,
+    private cropService: CropDataService
   ) {}
 
   ngOnInit(): void {
-    this.currentDate = 'Today, ' + formatDate(new Date(), 'MMMM d, yyyy', 'en');
+    const cropId = this.route.snapshot.paramMap.get('id');
+    // this.cropService.getCropStaticInfoById(cropId).then(cropStaticInfo => {
+    //     this.cropStatic = cropStaticInfo;
+    //   });
+    this.route.data.subscribe((data: { cropStaticInfo: CropStaticInfo }) => {
+      this.cropStatic = data.cropStaticInfo;
+    });
+    this.crop = this.cropService.getCropFromMyCropById(cropId);
+    this.currentDate = this.datePipe.transform(new Date(), 'MM/dd/yy');
     this.waterAdviceService.getWaterAdvice().subscribe( advice => {
       this.waterRecommeded = advice.stage.waterUse;
       this.wateringDecision = advice.wateringDecision;
-      this.plantingDays = advice.stage.age;
+      this.plantingDays = this.cropService.getPlantingDays(this.crop);
       this.stageNumber = advice.stage.stageNumber;
       this.temperature = advice.temperature;
       this.soilMoistureLevel = advice.soilMoistureReading.soilMoistureIndex;
@@ -52,6 +72,7 @@ export class AdviceComponent implements OnInit {
       this.rainfallPercentage = advice.rainfallPercentage;
       this.weatherIcon = advice.weatherIconTemp;
       this.adviceImg = advice.imageUrl;
+      console.log('adviceImg:', this.adviceImg);
     });
   }
 
@@ -63,7 +84,13 @@ export class AdviceComponent implements OnInit {
     this.router.navigateByUrl('/my-crops').then(r => {});
   }
 
-  onFabClicked() {
-    this.router.navigate(['/measure-soil']).then(r => {});
+  onMeasureClicked() {
+    this.cropService.setCrop(this.crop);
+    this.router.navigate(['/measure-soil/' + this.crop.id]).then(r => {});
   }
+
+  onPastReadingClicked() {
+    this.router.navigate(['/past-readings/']).then(r => {});
+  }
+
 }
