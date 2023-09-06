@@ -18,6 +18,7 @@ export interface PlantGrowthStage {
   waterUse: number;
   stageLength: number;
   rootDepthRange: RootDepthRange;
+  age: number;
 }
 
 export interface CropFacts {
