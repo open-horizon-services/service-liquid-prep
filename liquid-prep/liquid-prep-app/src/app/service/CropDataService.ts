@@ -327,7 +327,7 @@ export class CropDataService {
         stage = stages[i];
       }
     }
-    // stage.age = numberOfDaysFromSeedingDate;
+     stage.age = numberOfDaysFromSeedingDate;
     return stage;
   }
 
