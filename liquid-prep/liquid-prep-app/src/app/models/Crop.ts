@@ -25,7 +25,8 @@ export class Stage {
   stage: string;
   waterUse: number;
   stageLength: number;
-  rootDepth: number;
+  rootDeptMin: number;
+  rootDepthMax: number;
   url: string;
   age: number; // the days since the crop was planted
 }
