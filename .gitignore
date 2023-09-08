@@ -53,6 +53,8 @@ history*.txt
 notes/
 env.json
 .env
+*.crt
+*.key
 
 #CNM 
 credentials.h
