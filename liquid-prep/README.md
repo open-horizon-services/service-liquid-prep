@@ -122,11 +122,12 @@ HZN_MGMT_HUB_CERT_PATH=
 - ## Docker ps will show
 
   ```
-  CONTAINER ID   IMAGE                                     COMMAND                  CREATED       STATUS       PORTS                      NAMES
-  b717fad51b46   playbox21/homehub-express_amd64           "docker-entrypoint.s…"   2 weeks ago   Up 2 weeks   0.0.0.0:3000->3000/tcp     d47ae476ddce83e2718c465447ce6c079a34cd9eaeb8e4782033bd3688b59a84-homehub-express
-  b0e060d9131c   playbox21/mms-agent_amd64                 "npm start"              2 weeks ago   Up 2 weeks                              8cde4bd74e440496f07dd14f85b2842c9edf91d3990e6809efddaaebe69f7833-mms-agent
-  9bb6697fb947   playbox21/auto-dock-express_amd64:1.0.1   "sh /oh/input.sh"        2 weeks ago   Up 2 weeks                              auto-dock
-  eb92dbb1c01e   openhorizon/amd64_anax:2.30.0-952         "/root/anax.service …"   2 weeks ago   Up 2 weeks   127.0.0.1:8081->8510/tcp   horizon1
+  CONTAINER ID        IMAGE                                     COMMAND                  CREATED             STATUS              PORTS                      NAMES
+  cf4e98362460        playbox21/liquid-prep-express_arm64       "docker-entrypoint.s…"   5 hours ago         Up 5 hours          0.0.0.0:3003->3000/tcp     bd8230fff81961449fec83b8f7f4b2abb29e0db65463dc444609ccbfe7b74105-liquid-prep-express
+  65fab5086f75        playbox21/mms-agent_arm64                 "npm start"              5 hours ago         Up 5 hours          0.0.0.0:3000->3000/tcp     97c2631c68fbb9ed77f1f231207b3faf41c9499ed6d70a3ab0bb0707506f949b-mms-agent
+  714532bfa8c5        playbox21/auto-dock-express_arm64:1.0.5   "sh /oh/input.sh"        5 hours ago         Up 5 hours                                     auto-dock
+  2a592a160be0        openhorizon/arm64_anax:2.30.0-1194        "/root/anax.service …"   5 hours ago         Up 5 hours          127.0.0.1:8081->8510/tcp   horizon1
+
 
   ```
 
