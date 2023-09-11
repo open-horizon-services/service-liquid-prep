@@ -5,7 +5,7 @@ import WebSocket from 'ws';
 
 //const ffmpeg = require('ffmpeg');
 //const tfnode = require('@tensorflow/tfjs-node');
-const tfnode = {}
+const tfnode: any = {}
 const jsonfile = require('jsonfile');
 const cp = require('child_process'),
 exec = cp.exec;
