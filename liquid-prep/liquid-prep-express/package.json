@@ -1,6 +1,6 @@
 {
   "name": "liquid-prep-express",
-  "version": "1.0.9",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -30,11 +30,9 @@
   },
   "homepage": "https://github.com/Liquid-Prep/LiquidPrep-App#readme",
   "dependencies": {
-    "@tensorflow/tfjs-node": "^4.5.0",
     "cors": "^2.8.5",
     "express": "^4.17.2",
     "express-fileupload": "^1.2.1",
-    "ffmpeg": "^0.0.4",
     "jsonfile": "^6.1.0",
     "liquid-prep-lib": "^1.0.0",
     "rxjs": "^7.5.2",

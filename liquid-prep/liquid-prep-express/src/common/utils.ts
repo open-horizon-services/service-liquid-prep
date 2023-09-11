@@ -3,8 +3,9 @@ import * as http from 'http';
 import { forkJoin, Observable, Subject } from 'rxjs';
 import WebSocket from 'ws';
 
-const ffmpeg = require('ffmpeg');
-const tfnode = require('@tensorflow/tfjs-node');
+//const ffmpeg = require('ffmpeg');
+//const tfnode = require('@tensorflow/tfjs-node');
+const tfnode = {}
 const jsonfile = require('jsonfile');
 const cp = require('child_process'),
 exec = cp.exec;
@@ -352,28 +353,28 @@ export class Utils {
     }
   }
   checkVideo() {
-    try {
-      let video = this.getVideoFile(`${this.videoPath}/video`);
-      if(!video) {
-        return;
-      }
-      console.log('here')
-      this.extractVideo(video)
-      .subscribe((files: any) => {
-        if(files.length > 0) {
-          let images = files.filter((f) => f.indexOf('.jpg') > 0);
-          let video = files.filter((f) => f.indexOf('.jpg') < 0);
-          if(existsSync(video[0])) {
-            console.log(video[0]);
-            copyFileSync(video[0], './public/backup/video-old.mp4');
-            unlinkSync(video[0]);
-          }
-          this.inferenceVideo(images);  
-        }
-      })
-    } catch(e) {
-      console.log(e);
-    }
+    //try {
+    //  let video = this.getVideoFile(`${this.videoPath}/video`);
+    //  if(!video) {
+    //    return;
+    //  }
+    //  console.log('here')
+    //  this.extractVideo(video)
+    //  .subscribe((files: any) => {
+    //    if(files.length > 0) {
+    //      let images = files.filter((f) => f.indexOf('.jpg') > 0);
+    //      let video = files.filter((f) => f.indexOf('.jpg') < 0);
+    //      if(existsSync(video[0])) {
+    //        console.log(video[0]);
+    //        copyFileSync(video[0], './public/backup/video-old.mp4');
+    //        unlinkSync(video[0]);
+    //      }
+    //      this.inferenceVideo(images);  
+    //    }
+    //  })
+    //} catch(e) {
+    //  console.log(e);
+    //}
   }
   initialInference() {
     if(!existsSync(this.oldImage)) {
@@ -452,48 +453,48 @@ export class Utils {
       console.log(e);
     }
   }
-  extractVideo(file) {
-    return new Observable((observer) => {
-      try {
-        if(existsSync(file)) {
-          console.log('$video', file)
-          this.deleteFiles(this.videoPath, /.jpg|.png/);
-          let process = new ffmpeg(file);
-          process.then((video) => {
-            video.fnExtractFrameToJPG(this.videoPath, {
-              every_n_frames: 150,
-              number: 5,
-              keep_pixel_aspect_ratio : true,
-              keep_aspect_ratio: true,
-              file_name : `image.jpg`
-            }, (err, files) => {
-              if(!err) {
-                console.log('video file: ', files);
-                observer.next(files);
-                observer.complete();        
-              } else {
-                console.log('video err: ', err);
-                observer.next();
-                observer.complete();    
-              }
-            })  
-          }, (err) => {
-            console.log('err: ', err);
-            observer.next([]);
-            observer.complete();
-          })
-        } else {
-          console.log(`${file} not found`)
-          observer.next([]);
-          observer.complete();    
-        }
-      } catch(e) {
-        console.log('error: ', e.msg);
-        observer.next([]);
-        observer.complete();
-      }
-    });
-  }
+  //extractVideo(file) {
+  //  return new Observable((observer) => {
+  //    try {
+  //      if(existsSync(file)) {
+  //        console.log('$video', file)
+  //        this.deleteFiles(this.videoPath, /.jpg|.png/);
+  //        let process = new ffmpeg(file);
+  //        process.then((video) => {
+  //          video.fnExtractFrameToJPG(this.videoPath, {
+  //            every_n_frames: 150,
+  //            number: 5,
+  //            keep_pixel_aspect_ratio : true,
+  //            keep_aspect_ratio: true,
+  //            file_name : `image.jpg`
+  //          }, (err, files) => {
+  //            if(!err) {
+  //              console.log('video file: ', files);
+  //              observer.next(files);
+  //              observer.complete();        
+  //            } else {
+  //              console.log('video err: ', err);
+  //              observer.next();
+  //              observer.complete();    
+  //            }
+  //          })  
+  //        }, (err) => {
+  //          console.log('err: ', err);
+  //          observer.next([]);
+  //          observer.complete();
+  //        })
+  //      } else {
+  //        console.log(`${file} not found`)
+  //        observer.next([]);
+  //        observer.complete();    
+  //      }
+  //    } catch(e) {
+  //      console.log('error: ', e.msg);
+  //      observer.next([]);
+  //      observer.complete();
+  //    }
+  //  });
+  //}
   async checkNewModel () {
     let files = readdirSync(this.newModelPath);
     let list = files.filter(item => !(/(^|\/)\.[^\/\.]/g).test(item));

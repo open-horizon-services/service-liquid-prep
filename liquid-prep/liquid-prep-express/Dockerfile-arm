@@ -1,0 +1,14 @@
+FROM alpine:3.18
+RUN apk add --no-cache  --update nodejs-current npm curl bash procps
+RUN node --version
+RUN npm --version
+
+WORKDIR /server
+
+COPY . /server/
+
+RUN npm install -g npm
+RUN npm install
+RUN npm run build
+
+CMD ["npm", "start"]
