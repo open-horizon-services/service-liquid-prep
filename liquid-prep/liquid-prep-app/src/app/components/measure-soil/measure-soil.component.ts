@@ -108,7 +108,13 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
         this.heyBluetooth(data);
       });
 
-    } else {
+    } else if (connectionOption === 'ble_off') {
+      data = {type: 'BLEOFF', value: ''};
+      console.log(data)
+      this.heyBluetooth(data);
+
+    }
+     else {
       alert('Please choose one soil sensor connection option.');
     }
   }
