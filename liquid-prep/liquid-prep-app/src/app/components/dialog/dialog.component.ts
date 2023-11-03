@@ -144,6 +144,7 @@ export class DialogComponent implements OnInit {
   }
   run() {
     let type = this.selected;
+    console.log(type);
     switch(type) {
       case 'air_value':
       case 'water_value':
