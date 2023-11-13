@@ -74,6 +74,7 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
       this.connectUSB().then( sensorValue => {
         this.showReading(sensorValue);
       });
+      
     } else if (connectionOption === 'ble') {
       this.connectBluetooth().then( sensorValue => {
         this.showReading(sensorValue);
@@ -112,6 +113,17 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
       data = {type: 'BLEOFF', value: ''};
       console.log(data)
       this.heyBluetooth(data);
+
+    } else if (connectionOption === 'input_pin') {
+      this.inputPin().then( pin => {
+        if(!isNaN(parseInt(pin))) {
+          data = {type: 'PIN', value: pin};
+          console.log(data)
+          this.heyBluetooth(data);
+        } else {
+          console.log('invalid pin')
+        }
+      });
 
     }
      else {
@@ -174,6 +186,24 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
     const mode = prompt("Please enter <Water> or <Air> for calibration", );
     return mode;
   }
+  async inputPin() {
+    let valid = false;
+    let pin;
+  
+    while (!valid) {
+      pin = prompt("Please enter PIN between 0 and 39", "");
+      pin = parseInt(pin);
+  
+      if (!isNaN(pin) && pin >= 0 && pin <= 39) {
+        valid = true;
+      } else {
+        alert("Invalid PIN. Please enter a number between 0 and 39.");
+      }
+    }
+
+    return pin;
+  }
+  
   async updateWifi() {
     const channel = prompt("Please enter WiFi Channel", );
     return channel;
