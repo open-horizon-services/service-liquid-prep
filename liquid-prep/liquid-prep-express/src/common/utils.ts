@@ -49,7 +49,8 @@ export enum Task {
   WEB_REQUEST_RESULT = 22,
   UPDATE_WIFI_RESULT = 23,
   ENABLE_BLUETOOTH = 24,
-  DISABLE_BLUETOOTH = 25
+  DISABLE_BLUETOOTH = 25,
+  UPDATE_PIN = 26
 };
 export class Utils {
   homePath = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
