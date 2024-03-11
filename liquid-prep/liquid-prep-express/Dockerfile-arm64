@@ -1,4 +1,5 @@
-FROM arm64v8/node:20
+FROM --platform=linux/arm64 node:20-alpine
+#FROM arm64v8/node:20
 #FROM node:bullseye-slim
 
 #RUN apt-get update && \ 
@@ -10,10 +11,10 @@ FROM arm64v8/node:20
 #    libc6-dev \
 #    ffmpeg 
 
-RUN apt-get update -y && apt-get install ffmpeg -y && apt-get install vim -y
+#RUN apt-get update -y && apt-get install ffmpeg -y && apt-get install vim -y
 #RUN apt-get update -y && apt-get install -y apt-utils && apt-get install fswebcam ffmpeg -y && apt-get install mpg123 -y && apt-get install vim -y
 
-#RUN apk add --no-cache  --update nodejs-current npm curl bash procps tzdata
+RUN apk add --no-cache  --update nodejs-current npm curl bash procps tzdata
 RUN node --version
 RUN npm --version
 
@@ -27,7 +28,7 @@ COPY . /server
 
 RUN npm install -g npm
 RUN npm install
-RUN npm rebuild @tensorflow/tfjs-node --build-from-source
+#RUN npm rebuild @tensorflow/tfjs-node --build-from-source
 RUN npm run build
 
 VOLUME /mms_shared_volume

@@ -52,7 +52,8 @@ export class SensorsComponent implements OnInit {
     {value: 'query', text: 'Query Sensor'},
     {value: 'moisture', text: 'Get Moisture Reading'},
     {value: 'enable_bluetooth', text: 'Enable Bluetooth'},
-    {value: 'disable_bluetooth', text: 'Disable Bluetooth'}
+    {value: 'disable_bluetooth', text: 'Disable Bluetooth'},
+    {value: 'update_pin', text: 'Update Input Pin'},
   ];
   dialogRef: any;
   verticalPosition: MatSnackBarVerticalPosition = 'bottom';

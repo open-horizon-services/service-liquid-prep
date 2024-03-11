@@ -10,6 +10,8 @@ import { DateTimeUtil } from '../utility/DateTimeUtil';
 import { CropDataService } from './CropDataService';
 import { SoilMoistureService } from './SoilMoistureService';
 import { WeatherDataService } from './WeatherDataService';
+import {PlantGrowthStage} from '../models/api/CropInfoResp';
+
 
 @Injectable({
     providedIn: 'root',
@@ -73,6 +75,7 @@ export class WaterAdviceService {
     private AND = ' and ';
 
     private waterAdvice: Advice;
+    
 
     constructor(private weatherDataService: WeatherDataService,
                 private cropDataService: CropDataService,
@@ -102,7 +105,7 @@ export class WaterAdviceService {
       this.waterAdvice.soilMoistureReading = new SoilMoisture();
       this.waterAdvice.cropName = crop.cropName;
       this.waterAdvice.id = crop.id;
-      const stage: Stage = this.cropDataService.generateCropGrowthStage(crop);
+      const stage: PlantGrowthStage = this.cropDataService.generateCropGrowthStage(crop);
       this.waterAdvice.stage = stage;
       this.waterAdvice.waterRecommended = stage.waterUse;
       this.waterAdvice.soilMoistureReading.soilMoisturePercentage = soilMoisture.soilMoisturePercentage;
