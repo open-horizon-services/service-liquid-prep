@@ -171,11 +171,13 @@ export class CropDataService {
     return filteredCropList;
   }
 
+
   public async storeMyCropsInLocalStorage(crop: Crop) {
     try {
       const myCrops = await this.getLocalStorageMyCrops();
       const cropStaticInfo = await this.getCropStaticInfoById(crop.id);
       crop.url = cropStaticInfo.url;
+
       if (myCrops.length === 0) {
         myCrops.push(crop);
       } else {
@@ -192,6 +194,7 @@ export class CropDataService {
       throw new Error('Error storing crop data: ' + (error.message ? error.message : error));
     }
   }
+  
 
   public async removeCropFromLocalStorage(cropId: string) {
     try {

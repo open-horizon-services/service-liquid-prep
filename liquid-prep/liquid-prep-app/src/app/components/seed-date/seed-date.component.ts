@@ -3,8 +3,12 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Crop, Stage } from '../../models/Crop';
+
 import { CropDataService } from 'src/app/service/CropDataService';
 import { DateTimeUtil } from 'src/app/utility/DateTimeUtil';
+
+
+
 
 @Component({
   selector: 'app-seed-date',
@@ -14,6 +18,7 @@ import { DateTimeUtil } from 'src/app/utility/DateTimeUtil';
 export class SeedDateComponent implements OnInit {
   crop: Crop;
   stages: Stage[];
+  selectedSoilType: string;
   userSelectiondate: Date;
   maxDate = new Date();
 
@@ -65,7 +70,7 @@ export class SeedDateComponent implements OnInit {
 
     // add crop info to my crops list
     this.crop.seedingDate = userSelectedDate;
-    this.cropService.storeMyCropsInLocalStorage(this.crop);
+    this.cropService.storeMyCropsInLocalStorage(this.crop, this.selectedSoilType);
     // store selected crop id in session to generate water advise
     this.cropService.storeSelectedCropIdInSession(this.crop.id);
 
@@ -90,6 +95,29 @@ export class SeedDateComponent implements OnInit {
       }
     }
     return stage;
+  }
+
+
+  updateCrops(type: string): void {
+    let storedCrops = localStorage.getItem('my-crops');
+    console.log("Got here");
+
+    if (storedCrops) {
+      let crops: Crop[] = JSON.parse(storedCrops);
+
+      // Find the index of the object you want to modify
+      const cropIndex = crops.findIndex(crop => crop.id === "1");
+
+      // If the object is found
+      if (cropIndex !== -1) {
+        crops[cropIndex] = {
+          ...crops[cropIndex],
+          soilType: type,
+        };
+
+        localStorage.setItem('my-crops', JSON.stringify(crops));
+      }
+    }
   }
 
 }
