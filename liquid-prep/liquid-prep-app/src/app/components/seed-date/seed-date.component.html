@@ -12,7 +12,7 @@
       </button>
     </mat-toolbar-row>
   </mat-toolbar>
-  <div class="select-date-container">
+  <div class="select-date-soil-container">
     <img mat-card-image class="cardImg" src="assets/select-seed.png" alt="select seed date" />
     <label class="label">Select a seed date</label>
     <mat-form-field class="datePicker" appearance="fill">
@@ -23,9 +23,14 @@
     <mat-form-field class="select" appearance="fill">
         <mat-label>Soil Type</mat-label>
         <mat-select [(value)]="selectedSoilType">
-            <mat-option value="Sand">Sand</mat-option>
-            <mat-option value="Clay">Clay</mat-option>
-        </mat-select>
+          <mat-option value="Sand">Sand</mat-option>
+          <mat-option value="Sandy Loam">Sandy Loam</mat-option>
+          <mat-option value="Loam">Loam</mat-option>
+          <mat-option value="Silt Loam">Silt Loam</mat-option>
+          <mat-option value="Clay Loam">Clay Loam</mat-option>
+          <mat-option value="Silty Clay">Silty Clay</mat-option>
+          <mat-option value="Clay">Clay</mat-option>
+      </mat-select>
     </mat-form-field>
     <div class="dateAgo">
         {{userSelectiondate | dateAgo}}
