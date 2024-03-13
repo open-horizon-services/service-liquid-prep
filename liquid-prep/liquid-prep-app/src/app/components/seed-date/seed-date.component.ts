@@ -6,6 +6,7 @@ import { Crop, Stage } from '../../models/Crop';
 
 import { CropDataService } from 'src/app/service/CropDataService';
 import { DateTimeUtil } from 'src/app/utility/DateTimeUtil';
+import { NgForm } from '@angular/forms';
 
 
 
@@ -60,8 +61,11 @@ export class SeedDateComponent implements OnInit {
     this.location.back();
   }
 
-  clickConfirm(userSelectedDate: Date) {
-
+  clickConfirm(userSelectedDate: Date, selectedSoilType: string) {
+    if (!selectedSoilType) {
+      alert('Please select a soil type.');
+      return;
+    }
     const todayDate = new DateTimeUtil().getTodayDate();
     const numberOfDaysFromSeedingDate = Math.floor((Math.abs(todayDate.getTime() - userSelectedDate.getTime())) / (1000 * 3600 * 24));
 

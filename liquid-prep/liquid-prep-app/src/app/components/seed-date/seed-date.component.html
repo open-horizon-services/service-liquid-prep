@@ -20,7 +20,9 @@
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker touchUi #picker></mat-datepicker>
     </mat-form-field>
-    <mat-form-field class="select" appearance="fill">
+    <form #soilForm="ngForm" (ngSubmit)="clickConfirm(userSelectiondate, selectedSoilType)">
+
+    <mat-form-field class="select" appearance="fill" required> 
         <mat-label>Soil Type</mat-label>
         <mat-select [(value)]="selectedSoilType">
           <mat-option value="Sand">Sand</mat-option>
@@ -35,7 +37,8 @@
     <div class="dateAgo">
         {{userSelectiondate | dateAgo}}
     </div>
-    <button mat-flat-button class="c-btn" (click)="clickConfirm(userSelectiondate)">CONFIRM</button>
+    <button mat-flat-button class="c-btn" (click)="clickConfirm(userSelectiondate, selectedSoilType)">CONFIRM</button>
+  </form>
   </div>
   
 
