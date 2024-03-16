@@ -15,6 +15,7 @@ import { DialogComponent } from '../dialog/dialog.component';
 export class Device {
   status?: any;
   timeSeries: TimeSeries;
+  sensorType: SensorType;
   constructor() {
     this.timeSeries = new TimeSeries;
   }
@@ -32,12 +33,20 @@ export interface IServer {
   ws: string;
 }
 
+export enum SensorType {
+  oldSensor = 'OldSensor',
+  plantMate = 'PlantMate',
+}
+
 @Component({
   selector: 'app-sensors',
   templateUrl: './sensors.component.html',
   styleUrls: ['./sensors.component.scss']
 })
 export class SensorsComponent implements OnInit {
+  SensorType = SensorType;
+  selectedSensorType: SensorType; 
+
   devices: TimeSeries[] = [];
   columns: string[] = ['name', 'moisture', 'lastUpdate', 'action'];
   dataSource = new MatTableDataSource<TimeSeries>([]);
@@ -118,7 +127,7 @@ export class SensorsComponent implements OnInit {
           id: element.id,
           name: element.name,
           mac: element.mac,
-          moisture: element.moisture,
+          moisture: this.processReading(element.moisture),
           lastUpdate: new Date(element.timestamp).toLocaleTimeString(navigator.language, {month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute:'2-digit'})
         })
       this.dataSource.data = data;
@@ -154,4 +163,29 @@ export class SensorsComponent implements OnInit {
       }
     })
   }  
+
+  processOldSensor(reading: number): number {
+    // Y = -64.13 + 2.001x - 0.01049x^2
+    return -64.13 + (2.001 * reading) - (0.01049 * reading * reading);
+  }
+
+  processPlantMate(reading: number): number {
+    // Y = 7.845 - 0.1526x + 0.004196x^2
+    return 7.845 - (0.1526 * reading) + (0.004196 * reading * reading);
+  }
+
+  processReading(reading: number): number {
+    switch (this.selectedSensorType) {
+      case SensorType.oldSensor:
+        return this.processOldSensor(reading);
+      case SensorType.plantMate:
+        return this.processPlantMate(reading);
+      default:
+        console.error('Unknown sensor type');
+        return reading; 
+    }
+  }
+
 }
+
+

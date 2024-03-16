@@ -18,6 +18,12 @@
       </div>
     </form>  
 
+    <select [(ngModel)]="selectedSensorType">
+      <option [value]="SensorType.oldSensor">Old Sensor</option>
+      <option [value]="SensorType.plantMate">Plant Mate</option>
+    </select>
+    
+
     <mat-icon class="cached" (click)="refresh()">cached</mat-icon>
     <mat-icon class="cached" (click)="toggleServers()">fingerprint</mat-icon>
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 home-hub-table">
@@ -45,7 +51,10 @@
         <th mat-header-cell *matHeaderCellDef>Status</th>
         <td mat-cell *matCellDef="let element">
         </td>
+        
       </ng-container>
+
+      
 
       <tr mat-header-row *matHeaderRowDef="columns"></tr>
       <tr mat-row *matRowDef="let row; columns: columns;"></tr>
