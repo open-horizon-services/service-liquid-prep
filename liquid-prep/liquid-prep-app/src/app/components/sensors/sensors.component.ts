@@ -26,6 +26,10 @@ export class TimeSeries {
   mac?: string;
   lastUpdate?: any;
   moisture?: number;
+  sensorType?: SensorType;
+}
+interface DisplayTimeSeries extends TimeSeries {
+  displayMoisture?: number;
 }
 export interface IServer {
   edgeGateway: string;
@@ -44,8 +48,16 @@ export enum SensorType {
   styleUrls: ['./sensors.component.scss']
 })
 export class SensorsComponent implements OnInit {
-  SensorType = SensorType;
-  selectedSensorType: SensorType; 
+  displayedColumns = ['name', 'moisture', 'lastUpdate', 'action', 'sensorType']; 
+  sensorTypes = [SensorType.oldSensor, SensorType.plantMate];
+
+
+  onSensorTypeChange(element: any, newType: string) {
+    element.sensorType = newType;
+    const displayMoisture = this.processReading(element.moisture, newType);
+    element.displayMoisture = displayMoisture; 
+    this.dataSource.data = [...this.dataSource.data];
+  }
 
   devices: TimeSeries[] = [];
   columns: string[] = ['name', 'moisture', 'lastUpdate', 'action'];
@@ -120,16 +132,14 @@ export class SensorsComponent implements OnInit {
     let data: TimeSeries[] = [];
     Object.keys(devices).forEach((key) => {
       console.log('**', devices[key])
-        let element = devices[key];
-        element.mac = key;
-        this.devices.push(element);
-        data.push({
-          id: element.id,
-          name: element.name,
-          mac: element.mac,
-          moisture: this.processReading(element.moisture),
-          lastUpdate: new Date(element.timestamp).toLocaleTimeString(navigator.language, {month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute:'2-digit'})
-        })
+      let element = devices[key];
+      element.mac = key;
+      this.devices.push(element);
+      data.push({
+        ...element, 
+        moisture: this.processReading(element.moisture, element.sensorType), 
+        lastUpdate: new Date(element.lastUpdate).toLocaleTimeString(navigator.language, {month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute:'2-digit'})
+      })
       this.dataSource.data = data;
     })
   }
@@ -166,23 +176,23 @@ export class SensorsComponent implements OnInit {
 
   processOldSensor(reading: number): number {
     // Y = -64.13 + 2.001x - 0.01049x^2
-    return -64.13 + (2.001 * reading) - (0.01049 * reading * reading);
+    return Math.round((-64.13 + (2.001 * reading) - (0.01049 * reading * reading)) * 100) / 100;
   }
 
   processPlantMate(reading: number): number {
     // Y = 7.845 - 0.1526x + 0.004196x^2
-    return 7.845 - (0.1526 * reading) + (0.004196 * reading * reading);
+    return Math.round((7.845 - (0.1526 * reading) + (0.004196 * reading * reading)) * 100) / 100;
   }
 
-  processReading(reading: number): number {
-    switch (this.selectedSensorType) {
+  processReading(moisture: number, sensorType: string): number {
+    switch (sensorType) {
       case SensorType.oldSensor:
-        return this.processOldSensor(reading);
+        return this.processOldSensor(moisture);
       case SensorType.plantMate:
-        return this.processPlantMate(reading);
+        return this.processPlantMate(moisture);
       default:
-        console.error('Unknown sensor type');
-        return reading; 
+        console.error(`Unknown sensor type: ${sensorType}`);
+        return moisture; 
     }
   }
 

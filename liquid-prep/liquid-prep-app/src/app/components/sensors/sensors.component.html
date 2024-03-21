@@ -18,10 +18,6 @@
       </div>
     </form>  
 
-    <select [(ngModel)]="selectedSensorType">
-      <option [value]="SensorType.oldSensor">Old Sensor</option>
-      <option [value]="SensorType.plantMate">Plant Mate</option>
-    </select>
     
 
     <mat-icon class="cached" (click)="refresh()">cached</mat-icon>
@@ -39,7 +35,9 @@
       <!-- Status Column -->
       <ng-container matColumnDef="moisture">
         <th mat-header-cell *matHeaderCellDef> Moisture </th>
-        <td mat-cell *matCellDef="let element"> {{element.moisture}} </td>
+        <td mat-cell *matCellDef="let element">
+          {{ element.displayMoisture || element.moisture }}
+        </td>
       </ng-container>
 
       <!-- Last Updated Column -->
@@ -47,6 +45,21 @@
         <th mat-header-cell *matHeaderCellDef> Last Update </th>
         <td mat-cell *matCellDef="let element" class="date-font"> {{element.lastUpdate}} </td>
       </ng-container>
+
+      <ng-container matColumnDef="sensorType">
+        <th mat-header-cell *matHeaderCellDef> Sensor Type </th>
+        <td mat-cell *matCellDef="let element">
+          <mat-form-field appearance="fill">
+            <mat-select [(value)]="element.sensorType" (selectionChange)="onSensorTypeChange(element, $event.value)">
+              <mat-option *ngFor="let type of sensorTypes" [value]="type">
+                {{ type }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </td>
+      </ng-container>
+
+
       <ng-container matColumnDef="action">
         <th mat-header-cell *matHeaderCellDef>Status</th>
         <td mat-cell *matCellDef="let element">
@@ -56,8 +69,9 @@
 
       
 
-      <tr mat-header-row *matHeaderRowDef="columns"></tr>
-      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       <!--(click)="showDialog(row.mac)" class="hand-pointer"
       </tr>-->
     </table>
