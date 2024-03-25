@@ -34,9 +34,9 @@ export class CropDataService {
 
   private cropsListAPIUrl = config.backendAPIEndpoint + '/crop/list';
   private cropInfoAPIUrl = config.backendAPIEndpoint + '/crop/';
-  private cropImageMappingFile = '/assets/json/cropImageMapping.json';
-  private defaultImage = '/assets/crops-images/missing.jpg';
-  private stageImageMappingFile = '/assets/json/cropGrowthStageImageMapping.json';
+  private cropImageMappingFile = 'assets/json/cropImageMapping.json';
+  private defaultImage = 'assets/crops-images/missing.jpg';
+  private stageImageMappingFile = 'assets/json/cropGrowthStageImageMapping.json';
   private cropStaticInfoFile = 'assets/json/CropStaticInfoMapping.json';
 
   private crop: Crop; // used for passing data between components
@@ -252,7 +252,7 @@ export class CropDataService {
           if (crop.cropGrowthStage) {
             crop.cropGrowthStage.stages.forEach((stage) => {
               const stageUrl =
-                '/assets/crops-images/stage' + stage.stageNumber + '.png';
+                'assets/crops-images/stage' + stage.stageNumber + '.png';
               stage.url = stageUrl;
             });
           }
