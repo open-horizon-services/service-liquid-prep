@@ -50,15 +50,17 @@ export enum SensorType {
 export class SensorsComponent implements OnInit {
   displayedColumns = ['name', 'moisture', 'lastUpdate', 'action', 'sensorType']; 
   sensorTypes = [SensorType.oldSensor, SensorType.plantMate];
-
-
+  
   onSensorTypeChange(element: any, newType: string) {
     element.sensorType = newType;
     const displayMoisture = this.processReading(element.moisture, newType);
     element.displayMoisture = displayMoisture; 
     this.dataSource.data = [...this.dataSource.data];
+  
+    const sensorTypeMapping = JSON.parse(localStorage.getItem('sensorTypeMapping') || '{}');
+    sensorTypeMapping[element.mac] = newType;
+    localStorage.setItem('sensorTypeMapping', JSON.stringify(sensorTypeMapping));
   }
-
   devices: TimeSeries[] = [];
   columns: string[] = ['name', 'moisture', 'lastUpdate', 'action'];
   dataSource = new MatTableDataSource<TimeSeries>([]);
@@ -100,7 +102,9 @@ export class SensorsComponent implements OnInit {
       this.ws = this.servers.ws;
     }
     this.fetchTimeSeries();
+    this.applySavedSensorTypes();
   }
+  
   fetchTimeSeries() {
     this.http.get<Device>(`${this.edgeGateway}/log`)
       .subscribe(
@@ -196,6 +200,12 @@ export class SensorsComponent implements OnInit {
     }
   }
 
+  applySavedSensorTypes() {
+    const sensorTypeMapping = JSON.parse(localStorage.getItem('sensorTypeMapping') || '{}');
+    this.devices.forEach(device => {
+      if (sensorTypeMapping[device.mac]) {
+        device.sensorType = sensorTypeMapping[device.mac];
+      }
+    });
+  }
 }
-
-
