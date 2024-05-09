@@ -1,4 +1,4 @@
-import {DateTimeUtil} from '../utility/DateTimeUtil';
+import {CropFacts, PlantGrowthStage} from './api/CropInfoResp';
 
 export class Crop {
   id: string;
@@ -7,7 +7,9 @@ export class Crop {
   soilType: string;
   cropGrowthStage: CropGrowthStage;
   url: string; // crop image mapping url
+  facts: CropFacts;
   seedingDate: Date;
+  stage: PlantGrowthStage;
 }
 
 export class CropGrowthStage {
