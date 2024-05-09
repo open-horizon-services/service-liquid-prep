@@ -83,6 +83,11 @@ export class DialogComponent implements OnInit {
           this.newValue = "";
           this.show = true;
           break;
+        case 'update_pin':
+          this.label = 'Update Pin'
+          this.newValue = "";
+          this.show = true;
+          break;
         }
     }
   }
@@ -136,6 +141,11 @@ export class DialogComponent implements OnInit {
           this.label = 'Disable Bluetooth'
           this.show = false;
           break;
+        case 'update_pin':
+          this.label = 'Update Pin'
+          this.newValue = "";
+          this.show = true;
+          break;
         }
     }
   }
@@ -162,6 +172,9 @@ export class DialogComponent implements OnInit {
       case 'enable_bluetooth':
       case 'disable_bluetooth':
         this.msg = `${this.data.espnow}/update?host_addr=${this.data.mac}&${type}=`;
+        break;
+      case 'update_pin':
+        this.msg = `${this.data.espnow}/update?host_addr=${this.data.mac}&${type}=${this.newValue}`;
         break;
       }
     this.webSocketService.wsConnect(this.data.ws);

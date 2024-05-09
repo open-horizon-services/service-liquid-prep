@@ -3,8 +3,9 @@ import * as http from 'http';
 import { forkJoin, Observable, Subject } from 'rxjs';
 import WebSocket from 'ws';
 
-const ffmpeg = require('ffmpeg');
-const tfnode = require('@tensorflow/tfjs-node');
+//const ffmpeg = require('ffmpeg');
+//const tfnode = require('@tensorflow/tfjs-node');
+const tfnode :any = {};
 const jsonfile = require('jsonfile');
 const cp = require('child_process'),
 exec = cp.exec;
@@ -48,7 +49,8 @@ export enum Task {
   WEB_REQUEST_RESULT = 22,
   UPDATE_WIFI_RESULT = 23,
   ENABLE_BLUETOOTH = 24,
-  DISABLE_BLUETOOTH = 25
+  DISABLE_BLUETOOTH = 25,
+  UPDATE_PIN = 26
 };
 export class Utils {
   homePath = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
@@ -453,46 +455,50 @@ export class Utils {
     }
   }
   extractVideo(file) {
-    return new Observable((observer) => {
-      try {
-        if(existsSync(file)) {
-          console.log('$video', file)
-          this.deleteFiles(this.videoPath, /.jpg|.png/);
-          let process = new ffmpeg(file);
-          process.then((video) => {
-            video.fnExtractFrameToJPG(this.videoPath, {
-              every_n_frames: 150,
-              number: 5,
-              keep_pixel_aspect_ratio : true,
-              keep_aspect_ratio: true,
-              file_name : `image.jpg`
-            }, (err, files) => {
-              if(!err) {
-                console.log('video file: ', files);
-                observer.next(files);
-                observer.complete();        
-              } else {
-                console.log('video err: ', err);
-                observer.next();
-                observer.complete();    
-              }
-            })  
-          }, (err) => {
-            console.log('err: ', err);
-            observer.next([]);
-            observer.complete();
-          })
-        } else {
-          console.log(`${file} not found`)
-          observer.next([]);
-          observer.complete();    
-        }
-      } catch(e) {
-        console.log('error: ', e.msg);
-        observer.next([]);
-        observer.complete();
-      }
-    });
+  return new Observable((observer) => {
+    observer.next()
+    observer.complete()
+  })
+  //  return new Observable((observer) => {
+  //    try {
+  //      if(existsSync(file)) {
+  //        console.log('$video', file)
+  //        this.deleteFiles(this.videoPath, /.jpg|.png/);
+  //        let process = new ffmpeg(file);
+  //        process.then((video) => {
+  //          video.fnExtractFrameToJPG(this.videoPath, {
+  //            every_n_frames: 150,
+  //            number: 5,
+  //            keep_pixel_aspect_ratio : true,
+  //            keep_aspect_ratio: true,
+  //            file_name : `image.jpg`
+  //          }, (err, files) => {
+  //            if(!err) {
+  //              console.log('video file: ', files);
+  //              observer.next(files);
+  //              observer.complete();        
+  //            } else {
+  //              console.log('video err: ', err);
+  //              observer.next();
+  //              observer.complete();    
+  //            }
+  //          })  
+  //        }, (err) => {
+  //          console.log('err: ', err);
+  //          observer.next([]);
+  //          observer.complete();
+  //        })
+  //      } else {
+  //        console.log(`${file} not found`)
+  //        observer.next([]);
+  //        observer.complete();    
+  //      }
+  //    } catch(e) {
+  //      console.log('error: ', e.msg);
+  //      observer.next([]);
+  //      observer.complete();
+  //    }
+  //  });
   }
   async checkNewModel () {
     let files = readdirSync(this.newModelPath);
