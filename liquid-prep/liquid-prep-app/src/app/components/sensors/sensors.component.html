@@ -30,7 +30,7 @@
         <td mat-cell *matCellDef="let element" (click)="showDialog(element.mac)" class="hand-pointer"> {{element.name}} </td>
       </ng-container>
 
-      <!-- Status Column -->
+      <!-- Moisture Column -->
       <ng-container matColumnDef="moisture">
         <th mat-header-cell *matHeaderCellDef> Moisture </th>
         <td mat-cell *matCellDef="let element"> {{element.moisture}} </td>
@@ -41,9 +41,13 @@
         <th mat-header-cell *matHeaderCellDef> Last Update </th>
         <td mat-cell *matCellDef="let element" class="date-font"> {{element.lastUpdate}} </td>
       </ng-container>
+
+      <!-- Status Updated Column -->
       <ng-container matColumnDef="action">
         <th mat-header-cell *matHeaderCellDef>Status</th>
         <td mat-cell *matCellDef="let element">
+          <span *ngIf="isSensorActive(element.lastUpdate); else inactive">Active</span>
+          <ng-template #inactive>Inactive</ng-template>
         </td>
       </ng-container>
 

@@ -153,5 +153,9 @@ export class SensorsComponent implements OnInit {
         this.showMessage('Condition has been saved.')
       }
     })
-  }  
+  }
+  isSensorActive(lastUpdate: any) {
+    // inactive if last update is more than 24 hours
+    return new Date(lastUpdate).getTime() > Date.now() - 1000 * 60 * 60 * 24;
+  }
 }
