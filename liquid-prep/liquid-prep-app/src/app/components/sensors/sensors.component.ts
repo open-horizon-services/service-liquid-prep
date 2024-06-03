@@ -188,7 +188,12 @@ export class SensorsComponent implements OnInit {
     return Math.round((7.845 - (0.1526 * reading) + (0.004196 * reading * reading)) * 100) / 100;
   }
 
-  processReading(moisture: number, sensorType: string): number {
+  processReading(moisture: number, sensorType?: string): number {
+    if (!sensorType) {
+      console.warn('Sensor type is undefined. Defaulting to PlantMate.');
+      sensorType = SensorType.plantMate;
+    }
+  
     switch (sensorType) {
       case SensorType.oldSensor:
         return this.processOldSensor(moisture);
@@ -205,6 +210,9 @@ export class SensorsComponent implements OnInit {
     this.devices.forEach(device => {
       if (sensorTypeMapping[device.mac]) {
         device.sensorType = sensorTypeMapping[device.mac];
+      } else if (!device.sensorType) {
+        console.warn(`Sensor type for device ${device.mac} is undefined. Defaulting to PlantMate.`);
+        device.sensorType = SensorType.plantMate;
       }
     });
   }
