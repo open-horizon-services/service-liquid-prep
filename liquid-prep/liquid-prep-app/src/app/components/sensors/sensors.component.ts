@@ -142,10 +142,14 @@ export class SensorsComponent implements OnInit {
       console.log('**', devices[key])
       let element = devices[key];
       element.mac = key;
+      if (element.rawMoisture === undefined) {
+        element.rawMoisture = element.moisture;
+      }
       this.devices.push(element);
       data.push({
         ...element, 
-        moisture: this.processReading(element.moisture, element.sensorType), 
+        moisture: this.processReading(element.rawMoisture, element.sensorType), 
+        rawMoisture: element.rawMoisture,
         lastUpdate: new Date(element.lastUpdate).toLocaleTimeString(navigator.language, {month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute:'2-digit'})
       })
       this.dataSource.data = data;
