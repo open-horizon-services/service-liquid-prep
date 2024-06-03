@@ -14,10 +14,6 @@ header {
   @extend header;
 }
 
-.select-date-container {
-  margin: auto;
-}
-
 .cardImg {
   display: block;
   width: 35%;
@@ -53,4 +49,10 @@ header {
   background-color: #2F4FFE;
   font-size: 16px;
   letter-spacing: 2px;
+}
+
+.select-date-soil-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }

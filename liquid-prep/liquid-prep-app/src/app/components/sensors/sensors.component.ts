@@ -15,6 +15,7 @@ import { DialogComponent } from '../dialog/dialog.component';
 export class Device {
   status?: any;
   timeSeries: TimeSeries;
+  sensorType: SensorType;
   constructor() {
     this.timeSeries = new TimeSeries;
   }
@@ -25,11 +26,20 @@ export class TimeSeries {
   mac?: string;
   lastUpdate?: any;
   moisture?: number;
+  sensorType?: SensorType;
+}
+interface DisplayTimeSeries extends TimeSeries {
+  displayMoisture?: number;
 }
 export interface IServer {
   edgeGateway: string;
   espNowGateway: string;
   ws: string;
+}
+
+export enum SensorType {
+  oldSensor = 'OldSensor',
+  plantMate = 'PlantMate',
 }
 
 @Component({
@@ -38,6 +48,19 @@ export interface IServer {
   styleUrls: ['./sensors.component.scss']
 })
 export class SensorsComponent implements OnInit {
+  displayedColumns = ['name', 'moisture', 'lastUpdate', 'action', 'sensorType']; 
+  sensorTypes = [SensorType.oldSensor, SensorType.plantMate];
+  
+  onSensorTypeChange(element: any, newType: string) {
+    element.sensorType = newType;
+    const displayMoisture = this.processReading(element.moisture, newType);
+    element.displayMoisture = displayMoisture; 
+    this.dataSource.data = [...this.dataSource.data];
+  
+    const sensorTypeMapping = JSON.parse(localStorage.getItem('sensorTypeMapping') || '{}');
+    sensorTypeMapping[element.mac] = newType;
+    localStorage.setItem('sensorTypeMapping', JSON.stringify(sensorTypeMapping));
+  }
   devices: TimeSeries[] = [];
   columns: string[] = ['name', 'moisture', 'lastUpdate', 'action'];
   dataSource = new MatTableDataSource<TimeSeries>([]);
@@ -79,7 +102,9 @@ export class SensorsComponent implements OnInit {
       this.ws = this.servers.ws;
     }
     this.fetchTimeSeries();
+    this.applySavedSensorTypes();
   }
+  
   fetchTimeSeries() {
     this.http.get<Device>(`${this.edgeGateway}/log`)
       .subscribe(
@@ -111,16 +136,14 @@ export class SensorsComponent implements OnInit {
     let data: TimeSeries[] = [];
     Object.keys(devices).forEach((key) => {
       console.log('**', devices[key])
-        let element = devices[key];
-        element.mac = key;
-        this.devices.push(element);
-        data.push({
-          id: element.id,
-          name: element.name,
-          mac: element.mac,
-          moisture: element.moisture,
-          lastUpdate: new Date(element.timestamp).toLocaleTimeString(navigator.language, {month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute:'2-digit'})
-        })
+      let element = devices[key];
+      element.mac = key;
+      this.devices.push(element);
+      data.push({
+        ...element, 
+        moisture: this.processReading(element.moisture, element.sensorType), 
+        lastUpdate: new Date(element.lastUpdate).toLocaleTimeString(navigator.language, {month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute:'2-digit'})
+      })
       this.dataSource.data = data;
     })
   }
@@ -154,4 +177,35 @@ export class SensorsComponent implements OnInit {
       }
     })
   }  
+
+  processOldSensor(reading: number): number {
+    // Y = -64.13 + 2.001x - 0.01049x^2
+    return Math.round((-64.13 + (2.001 * reading) - (0.01049 * reading * reading)) * 100) / 100;
+  }
+
+  processPlantMate(reading: number): number {
+    // Y = 7.845 - 0.1526x + 0.004196x^2
+    return Math.round((7.845 - (0.1526 * reading) + (0.004196 * reading * reading)) * 100) / 100;
+  }
+
+  processReading(moisture: number, sensorType: string): number {
+    switch (sensorType) {
+      case SensorType.oldSensor:
+        return this.processOldSensor(moisture);
+      case SensorType.plantMate:
+        return this.processPlantMate(moisture);
+      default:
+        console.error(`Unknown sensor type: ${sensorType}`);
+        return moisture; 
+    }
+  }
+
+  applySavedSensorTypes() {
+    const sensorTypeMapping = JSON.parse(localStorage.getItem('sensorTypeMapping') || '{}');
+    this.devices.forEach(device => {
+      if (sensorTypeMapping[device.mac]) {
+        device.sensorType = sensorTypeMapping[device.mac];
+      }
+    });
+  }
 }
