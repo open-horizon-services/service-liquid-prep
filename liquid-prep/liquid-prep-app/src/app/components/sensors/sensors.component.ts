@@ -26,6 +26,7 @@ export class TimeSeries {
   mac?: string;
   lastUpdate?: any;
   moisture?: number;
+  rawMoisture?: number;
   sensorType?: SensorType;
 }
 interface DisplayTimeSeries extends TimeSeries {
@@ -52,8 +53,11 @@ export class SensorsComponent implements OnInit {
   sensorTypes = [SensorType.oldSensor, SensorType.plantMate];
   
   onSensorTypeChange(element: any, newType: string) {
+    if (element.rawMoisture === undefined) {
+      element.rawMoisture = element.moisture;
+    }
     element.sensorType = newType;
-    const displayMoisture = this.processReading(element.moisture, newType);
+    const displayMoisture = this.processReading(element.rawMoisture, newType);
     element.displayMoisture = displayMoisture; 
     this.dataSource.data = [...this.dataSource.data];
   
@@ -187,7 +191,6 @@ export class SensorsComponent implements OnInit {
     // Y = 7.845 - 0.1526x + 0.004196x^2
     return Math.round((7.845 - (0.1526 * reading) + (0.004196 * reading * reading)) * 100) / 100;
   }
-
   processReading(moisture: number, sensorType?: string): number {
     if (!sensorType) {
       console.warn('Sensor type is undefined. Defaulting to PlantMate.');
