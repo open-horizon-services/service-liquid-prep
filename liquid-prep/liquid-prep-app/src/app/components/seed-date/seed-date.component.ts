@@ -6,6 +6,7 @@ import { Crop, Stage } from '../../models/Crop';
 
 import { CropDataService } from 'src/app/service/CropDataService';
 import { DateTimeUtil } from 'src/app/utility/DateTimeUtil';
+import { NgForm } from '@angular/forms';
 
 
 
@@ -60,8 +61,11 @@ export class SeedDateComponent implements OnInit {
     this.location.back();
   }
 
-  clickConfirm(userSelectedDate: Date) {
-
+  clickConfirm(userSelectedDate: Date, selectedSoilType: string) {
+    if (!selectedSoilType) {
+      alert('Please select a soil type.');
+      return;
+    }
     const todayDate = new DateTimeUtil().getTodayDate();
     const numberOfDaysFromSeedingDate = Math.floor((Math.abs(todayDate.getTime() - userSelectedDate.getTime())) / (1000 * 3600 * 24));
 
@@ -70,6 +74,7 @@ export class SeedDateComponent implements OnInit {
 
     // add crop info to my crops list
     this.crop.seedingDate = userSelectedDate;
+    this.crop.soilType = this.selectedSoilType;
     this.cropService.storeMyCropsInLocalStorage(this.crop);
     // store selected crop id in session to generate water advise
     this.cropService.storeSelectedCropIdInSession(this.crop.id);
@@ -100,7 +105,6 @@ export class SeedDateComponent implements OnInit {
 
   updateCrops(type: string): void {
     let storedCrops = localStorage.getItem('my-crops');
-    console.log("Got here");
 
     if (storedCrops) {
       let crops: Crop[] = JSON.parse(storedCrops);

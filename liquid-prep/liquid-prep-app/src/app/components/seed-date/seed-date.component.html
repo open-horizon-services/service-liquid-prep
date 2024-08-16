@@ -12,7 +12,7 @@
       </button>
     </mat-toolbar-row>
   </mat-toolbar>
-  <div class="select-date-container">
+  <div class="select-date-soil-container">
     <img mat-card-image class="cardImg" src="assets/select-seed.png" alt="select seed date" />
     <label class="label">Select a seed date</label>
     <mat-form-field class="datePicker" appearance="fill">
@@ -20,17 +20,25 @@
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker touchUi #picker></mat-datepicker>
     </mat-form-field>
-    <mat-form-field class="select" appearance="fill">
+    <form #soilForm="ngForm" (ngSubmit)="clickConfirm(userSelectiondate, selectedSoilType)">
+
+    <mat-form-field class="select" appearance="fill" required> 
         <mat-label>Soil Type</mat-label>
         <mat-select [(value)]="selectedSoilType">
-            <mat-option value="Sand">Sand</mat-option>
-            <mat-option value="Clay">Clay</mat-option>
-        </mat-select>
+          <mat-option value="Sand">Sand</mat-option>
+          <mat-option value="Sandy Loam">Sandy Loam</mat-option>
+          <mat-option value="Loam">Loam</mat-option>
+          <mat-option value="Silt Loam">Silt Loam</mat-option>
+          <mat-option value="Clay Loam">Clay Loam</mat-option>
+          <mat-option value="Silty Clay">Silty Clay</mat-option>
+          <mat-option value="Clay">Clay</mat-option>
+      </mat-select>
     </mat-form-field>
     <div class="dateAgo">
         {{userSelectiondate | dateAgo}}
     </div>
-    <button mat-flat-button class="c-btn" (click)="clickConfirm(userSelectiondate)">CONFIRM</button>
+    <button mat-flat-button class="c-btn" (click)="clickConfirm(userSelectiondate, selectedSoilType)">CONFIRM</button>
+  </form>
   </div>
   
 
