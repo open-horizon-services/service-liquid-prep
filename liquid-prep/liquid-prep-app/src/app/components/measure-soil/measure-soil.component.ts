@@ -176,7 +176,7 @@ export class MeasureSoilComponent implements OnInit, AfterViewInit {
     return buf;
   }
   showReading(sensorValue: number) {
-    if (sensorValue) {
+    if (sensorValue >= 0) {
       const soilMoisture = this.sensorValueLimitCorrection(sensorValue);
       this.soilService.setSoilMoistureReading(soilMoisture);
       this.setMeasureView('measuring');
